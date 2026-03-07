@@ -29,6 +29,15 @@ export async function POST(request: NextRequest) {
     const eventTime = reservation.event_tables?.events?.start_time?.slice(0, 5) || '23:00'
 
     const html = confirmationEmail({
+      const cancellationDeadline = reservation.cancellation_deadline
+      ? new Date(reservation.cancellation_deadline).toLocaleDateString('fr-FR', {
+          day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+        })
+      : undefined
+
+    const cancellationLink = `${process.env.NEXT_PUBLIC_APP_URL}/reserve/${reservation.venues?.slug}/cancel/${reservation.id}`
+
+    const html = confirmationEmail({
       clientName: reservation.client_name,
       eventName: reservation.event_tables?.events?.name || '',
       eventDate,
@@ -42,6 +51,8 @@ export async function POST(request: NextRequest) {
       guestCount: reservation.guest_count,
       depositAmount: reservation.deposit_amount,
       specialRequest: reservation.special_request,
+      cancellationLink,
+      cancellationDeadline,
     })
 
     await resend.emails.send({
