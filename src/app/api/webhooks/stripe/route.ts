@@ -4,10 +4,6 @@ import { createClient } from '@/lib/supabase/server'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
-export const config = {
-  api: { bodyParser: false }
-}
-
 export async function POST(request: NextRequest) {
   const body = await request.text()
   const signature = request.headers.get('stripe-signature')
@@ -43,27 +39,24 @@ export async function POST(request: NextRequest) {
           stripe_payment_status: 'succeeded',
         })
         .eq('id', reservationId)
+
+      await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/emails/send`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reservationId }),
+      })
     }
   }
 
   if (event.type === 'checkout.session.expired') {
     const session = event.data.object as Stripe.Checkout.Session
     const reservationId = session.metadata?.reservation_id
-if (reservationId) {
+
+    if (reservationId) {
       await supabase
         .from('reservations')
-        .update({
-          status: 'confirmed',
-          stripe_payment_status: 'succeeded',
-        })
+        .update({ stripe_payment_status: 'expired' })
         .eq('id', reservationId)
-
-      // Envoi email de confirmation
-      await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/emails/send`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reservationId }),
-      })
     }
   }
 
