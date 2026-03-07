@@ -12,7 +12,8 @@ import {
   Settings,
   LogOut,
   Menu,
-  X
+  X,
+  Users
 } from 'lucide-react'
 
 const navItems = [
@@ -20,6 +21,7 @@ const navItems = [
   { href: '/dashboard/events', label: 'Soirées', icon: CalendarDays },
   { href: '/dashboard/tables', label: 'Carrés VIP', icon: Armchair },
   { href: '/dashboard/drinks', label: 'Carte boissons', icon: Wine },
+  { href: '/dashboard/reservations', label: 'Réservations', icon: Users },
   { href: '/dashboard/settings', label: 'Paramètres', icon: Settings },
 ]
 
