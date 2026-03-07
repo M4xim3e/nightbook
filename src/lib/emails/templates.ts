@@ -113,7 +113,19 @@ export function confirmationEmail({
       <p style="color:#d4d4d8;font-size:13px;margin:0;">${dressCode}</p>
     </div>
     ` : ''}
-
+${cancellationLink ? `
+    <!-- Annulation -->
+    <div style="text-align:center;margin-top:16px;">
+      <p style="color:#52525b;font-size:12px;margin:0 0 8px;">
+        Annulation possible jusqu'au ${cancellationDeadline || ''}
+      </p>
+      <a href="${cancellationLink}"
+        style="color:#ef4444;font-size:12px;text-decoration:underline;">
+        Annuler ma réservation
+      </a>
+    </div>
+    ` : ''}
+    
     <!-- Footer -->
     <div style="text-align:center;margin-top:24px;">
       <p style="color:#3f3f46;font-size:12px;margin:0;">
