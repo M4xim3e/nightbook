@@ -30,8 +30,6 @@ export function confirmationEmail({
   specialRequest?: string
   cancellationLink?: string
   cancellationDeadline?: string
-})
-
 }) {
   return `
 <!DOCTYPE html>
@@ -44,31 +42,24 @@ export function confirmationEmail({
 <body style="margin:0;padding:0;background:#0a0a0a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
   <div style="max-width:560px;margin:0 auto;padding:40px 20px;">
 
-    <!-- Header -->
     <div style="text-align:center;margin-bottom:32px;">
       <h1 style="color:#ffffff;font-size:28px;font-weight:700;margin:0 0 8px;">NightBook</h1>
       <p style="color:#71717a;margin:0;font-size:14px;">Plateforme de réservation VIP</p>
     </div>
 
-    <!-- Card principale -->
     <div style="background:#18181b;border:1px solid #27272a;border-radius:16px;padding:32px;margin-bottom:16px;">
-      
-      <!-- Icône succès -->
       <div style="text-align:center;margin-bottom:24px;">
         <div style="display:inline-block;background:#16a34a20;border-radius:50%;padding:16px;">
           <span style="font-size:32px;">✅</span>
         </div>
       </div>
-
       <h2 style="color:#ffffff;font-size:20px;font-weight:600;margin:0 0 8px;text-align:center;">
         Réservation confirmée !
       </h2>
       <p style="color:#a1a1aa;font-size:14px;text-align:center;margin:0 0 28px;">
         Bonjour ${clientName}, votre place est bien réservée.
       </p>
-
-      <!-- Détails -->
-      <div style="border-top:1px solid #27272a;padding-top:20px;space-y:12px;">
+      <div style="border-top:1px solid #27272a;padding-top:20px;">
         ${[
           ['📅 Soirée', eventName],
           ['📆 Date', `${eventDate} à ${eventTime}`],
@@ -81,8 +72,6 @@ export function confirmationEmail({
             <span style="color:#ffffff;font-size:13px;font-weight:500;">${value}</span>
           </div>
         `).join('')}
-        
-        <!-- Acompte -->
         <div style="display:flex;justify-content:space-between;padding:14px 0 0;margin-top:4px;">
           <span style="color:#a1a1aa;font-size:14px;font-weight:600;">💳 Acompte payé</span>
           <span style="color:#a855f7;font-size:16px;font-weight:700;">${(depositAmount / 100).toFixed(0)}€</span>
@@ -91,7 +80,6 @@ export function confirmationEmail({
     </div>
 
     ${specialRequest ? `
-    <!-- Demande spéciale -->
     <div style="background:#18181b;border:1px solid #27272a;border-radius:12px;padding:20px;margin-bottom:16px;">
       <p style="color:#a855f7;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin:0 0 8px;">✨ Votre demande spéciale</p>
       <p style="color:#d4d4d8;font-size:13px;margin:0;">${specialRequest}</p>
@@ -99,7 +87,6 @@ export function confirmationEmail({
     ` : ''}
 
     ${arrivalInfo ? `
-    <!-- Infos arrivée -->
     <div style="background:#18181b;border:1px solid #27272a;border-radius:12px;padding:20px;margin-bottom:16px;">
       <p style="color:#71717a;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin:0 0 8px;">📍 Infos arrivée</p>
       <p style="color:#d4d4d8;font-size:13px;margin:0;">${arrivalInfo}</p>
@@ -107,27 +94,24 @@ export function confirmationEmail({
     ` : ''}
 
     ${dressCode ? `
-    <!-- Dress code -->
     <div style="background:#18181b;border:1px solid #27272a;border-radius:12px;padding:20px;margin-bottom:16px;">
       <p style="color:#71717a;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin:0 0 8px;">👔 Dress code</p>
       <p style="color:#d4d4d8;font-size:13px;margin:0;">${dressCode}</p>
     </div>
     ` : ''}
-${cancellationLink ? `
-    <!-- Annulation -->
-    <div style="text-align:center;margin-top:16px;">
-      <p style="color:#52525b;font-size:12px;margin:0 0 8px;">
+
+    ${cancellationLink ? `
+    <div style="text-align:center;margin-top:8px;margin-bottom:16px;">
+      <p style="color:#52525b;font-size:12px;margin:0 0 6px;">
         Annulation possible jusqu'au ${cancellationDeadline || ''}
       </p>
-      <a href="${cancellationLink}"
-        style="color:#ef4444;font-size:12px;text-decoration:underline;">
+      <a href="${cancellationLink}" style="color:#ef4444;font-size:12px;text-decoration:underline;">
         Annuler ma réservation
       </a>
     </div>
     ` : ''}
-    
-    <!-- Footer -->
-    <div style="text-align:center;margin-top:24px;">
+
+    <div style="text-align:center;margin-top:16px;">
       <p style="color:#3f3f46;font-size:12px;margin:0;">
         Cet email a été envoyé automatiquement par NightBook.<br>
         En cas de problème, contactez directement l'établissement.
@@ -189,7 +173,6 @@ export function reminderEmail({
       <p style="color:#a1a1aa;font-size:14px;text-align:center;margin:0 0 28px;">
         Bonjour ${clientName}, votre soirée VIP est ce soir. On vous attend !
       </p>
-
       <div style="border-top:1px solid #27272a;padding-top:20px;">
         ${[
           ['📅 Soirée', eventName],
