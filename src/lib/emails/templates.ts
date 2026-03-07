@@ -12,6 +12,8 @@ export function confirmationEmail({
   guestCount,
   depositAmount,
   specialRequest,
+  cancellationLink,
+  cancellationDeadline,
 }: {
   clientName: string
   eventName: string
@@ -26,6 +28,10 @@ export function confirmationEmail({
   guestCount: number
   depositAmount: number
   specialRequest?: string
+  cancellationLink?: string
+  cancellationDeadline?: string
+})
+
 }) {
   return `
 <!DOCTYPE html>
