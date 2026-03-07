@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@supabase/supabase-js'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 export async function POST(request: NextRequest) {
   const body = await request.text()
@@ -25,20 +30,22 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
   }
 
-  const supabase = await createClient()
-
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session
     const reservationId = session.metadata?.reservation_id
 
     if (reservationId) {
-      await supabase
+      const { error } = await supabase
         .from('reservations')
         .update({
           status: 'confirmed',
           stripe_payment_status: 'succeeded',
         })
         .eq('id', reservationId)
+
+      if (error) {
+        console.error('Supabase update error:', error)
+      }
 
       await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/emails/send`, {
         method: 'POST',
