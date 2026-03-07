@@ -49,12 +49,21 @@ export async function POST(request: NextRequest) {
   if (event.type === 'checkout.session.expired') {
     const session = event.data.object as Stripe.Checkout.Session
     const reservationId = session.metadata?.reservation_id
-
-    if (reservationId) {
+if (reservationId) {
       await supabase
         .from('reservations')
-        .update({ stripe_payment_status: 'expired' })
+        .update({
+          status: 'confirmed',
+          stripe_payment_status: 'succeeded',
+        })
         .eq('id', reservationId)
+
+      // Envoi email de confirmation
+      await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/emails/send`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reservationId }),
+      })
     }
   }
 
