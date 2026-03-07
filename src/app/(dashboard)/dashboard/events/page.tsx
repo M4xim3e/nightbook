@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Plus, Calendar, Trash2, Eye, EyeOff } from 'lucide-react'
+import { Plus, Calendar, Trash2, Eye, EyeOff, Copy } from 'lucide-react'
 
 type Event = {
   id: string
@@ -21,6 +21,9 @@ export default function EventsPage() {
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState({ name: '', date: '', start_time: '23:00', theme: '', description: '' })
   const [saving, setSaving] = useState(false)
+  const [duplicating, setDuplicating] = useState<string | null>(null)
+  const [duplicateDate, setDuplicateDate] = useState('')
+  const [duplicateEventId, setDuplicateEventId] = useState<string | null>(null)
   const supabase = createClient()
 
   useEffect(() => { loadData() }, [])
@@ -46,18 +49,68 @@ export default function EventsPage() {
     setSaving(false)
   }
 
+  const handleDuplicate = async () => {
+    if (!duplicateEventId || !duplicateDate) return
+    setSaving(true)
+
+    const original = events.find(e => e.id === duplicateEventId)
+    if (!original) return
+
+    // Créer la nouvelle soirée
+    const { data: newEvent } = await supabase
+      .from('events')
+      .insert({
+        venue_id: venueId,
+        name: original.name,
+        date: duplicateDate,
+        start_time: original.start_time,
+        theme: original.theme,
+        description: original.description,
+        is_published: false,
+      })
+      .select()
+      .single()
+
+    if (newEvent) {
+      // Récupérer les carrés assignés à la soirée originale
+      const { data: originalTables } = await supabase
+        .from('event_tables')
+        .select('*')
+        .eq('event_id', duplicateEventId)
+
+      // Les dupliquer pour la nouvelle soirée
+      if (originalTables && originalTables.length > 0) {
+        await supabase.from('event_tables').insert(
+          originalTables.map(t => ({
+            event_id: newEvent.id,
+            vip_table_id: t.vip_table_id,
+            custom_min_spending: t.custom_min_spending,
+            is_available: true,
+          }))
+        )
+      }
+    }
+
+    setDuplicateEventId(null)
+    setDuplicateDate('')
+    await loadData()
+    setSaving(false)
+  }
+
   const togglePublish = async (event: Event) => {
     await supabase.from('events').update({ is_published: !event.is_published }).eq('id', event.id)
     await loadData()
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Supprimer cette soirée ?')) return
+    if (!confirm('Supprimer cette soirée ? Les réservations associées seront également supprimées.')) return
     await supabase.from('events').delete().eq('id', id)
     await loadData()
   }
 
-  const formatDate = (d: string) => new Date(d).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+  const formatDate = (d: string) => new Date(d).toLocaleDateString('fr-FR', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+  })
 
   return (
     <div>
@@ -66,7 +119,8 @@ export default function EventsPage() {
           <h2 className="text-2xl font-bold text-white">Soirées</h2>
           <p className="text-zinc-400 mt-1">Gérez vos soirées et rendez-les visibles aux clients</p>
         </div>
-        <button onClick={() => setShowForm(!showForm)}
+        <button
+          onClick={() => { setShowForm(!showForm); setDuplicateEventId(null) }}
           className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold px-4 py-2.5 rounded-xl transition">
           <Plus size={18} /> Nouvelle soirée
         </button>
@@ -117,6 +171,42 @@ export default function EventsPage() {
         </div>
       )}
 
+      {/* Formulaire duplication */}
+      {duplicateEventId && (
+        <div className="bg-zinc-900 border border-purple-500/30 rounded-2xl p-6 mb-6">
+          <h3 className="text-white font-semibold mb-1">
+            Dupliquer — {events.find(e => e.id === duplicateEventId)?.name}
+          </h3>
+          <p className="text-zinc-500 text-sm mb-4">
+            Tous les paramètres et carrés assignés seront copiés. Choisissez juste la nouvelle date.
+          </p>
+          <div className="flex gap-3 items-end">
+            <div className="flex-1">
+              <label className="text-sm text-zinc-400 mb-1 block">Nouvelle date *</label>
+              <input
+                type="date"
+                value={duplicateDate}
+                onChange={e => setDuplicateDate(e.target.value)}
+                className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition"
+              />
+            </div>
+            <button
+              onClick={() => { setDuplicateEventId(null); setDuplicateDate('') }}
+              className="px-4 py-3 text-zinc-400 hover:text-white text-sm transition"
+            >
+              Annuler
+            </button>
+            <button
+              onClick={handleDuplicate}
+              disabled={saving || !duplicateDate}
+              className="bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white font-semibold px-6 py-3 rounded-xl transition"
+            >
+              {saving ? 'Duplication...' : 'Dupliquer'}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Liste soirées */}
       {loading ? (
         <div className="text-zinc-500 text-center py-12">Chargement...</div>
@@ -141,13 +231,24 @@ export default function EventsPage() {
                 {event.theme && <p className="text-zinc-500 text-sm mt-0.5">🎉 {event.theme}</p>}
               </div>
               <div className="flex items-center gap-2 shrink-0">
-                <button onClick={() => togglePublish(event)}
+                <button
+                  onClick={() => { setDuplicateEventId(event.id); setDuplicateDate(''); setShowForm(false) }}
+                  className="p-2 rounded-lg text-zinc-400 hover:text-purple-400 hover:bg-zinc-800 transition"
+                  title="Dupliquer"
+                >
+                  <Copy size={16} />
+                </button>
+                <button
+                  onClick={() => togglePublish(event)}
                   className="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition"
-                  title={event.is_published ? 'Dépublier' : 'Publier'}>
+                  title={event.is_published ? 'Dépublier' : 'Publier'}
+                >
                   {event.is_published ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
-                <button onClick={() => handleDelete(event.id)}
-                  className="p-2 rounded-lg text-zinc-400 hover:text-red-400 hover:bg-zinc-800 transition">
+                <button
+                  onClick={() => handleDelete(event.id)}
+                  className="p-2 rounded-lg text-zinc-400 hover:text-red-400 hover:bg-zinc-800 transition"
+                >
                   <Trash2 size={16} />
                 </button>
               </div>
