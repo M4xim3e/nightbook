@@ -4,16 +4,28 @@ import { createClient } from '@/lib/supabase/server'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
+export const config = {
+  api: { bodyParser: false }
+}
+
 export async function POST(request: NextRequest) {
   const body = await request.text()
-  const signature = request.headers.get('stripe-signature')!
+  const signature = request.headers.get('stripe-signature')
+
+  if (!signature) {
+    return NextResponse.json({ error: 'No signature' }, { status: 400 })
+  }
 
   let event: Stripe.Event
 
   try {
-    event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET!)
+    event = stripe.webhooks.constructEvent(
+      body,
+      signature,
+      process.env.STRIPE_WEBHOOK_SECRET!
+    )
   } catch (error) {
-    console.error('Webhook signature error:', error)
+    console.error('Webhook error:', error)
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
   }
 
