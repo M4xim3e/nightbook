@@ -177,8 +177,23 @@ export default function ReservePage() {
       await supabase.from('reservation_drinks').insert(drinkInserts)
     }
 
-    setSuccess(true)
-    setSubmitting(false)
+    // Redirection vers Stripe
+    const response = await fetch('/api/stripe/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reservationId: reservation.id }),
+    })
+
+    const { url, error: stripeError } = await response.json()
+
+    if (stripeError || !url) {
+      setError('Erreur lors de la création du paiement')
+      setSubmitting(false)
+      return
+    }
+
+    window.location.href = url
+    
   }
 
   const formatDate = (dateStr: string) => {
