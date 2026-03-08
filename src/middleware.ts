@@ -24,44 +24,37 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   const pathname = request.nextUrl.pathname
 
-  // Redirection si non connecté
-  if (!user && pathname.startsWith('/dashboard')) {
+  // Non connecté → login
+  if (!user && (pathname.startsWith('/dashboard') || pathname.startsWith('/admin'))) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  // Redirection si non connecté sur /admin
-  if (!user && pathname.startsWith('/admin')) {
-    return NextResponse.redirect(new URL('/login', request.url))
-  }
-
-  // Redirection si déjà connecté
+  // Déjà connecté → ne pas rester sur login/register
   if (user && (pathname === '/login' || pathname === '/register')) {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
+    const { data: adminRecord } = await supabase
+      .from('admins').select('id').eq('email', user.email).single()
+    return NextResponse.redirect(new URL(adminRecord ? '/admin' : '/dashboard', request.url))
   }
 
-  // Vérification admin
+  // Protection /admin → réservé aux admins
   if (user && pathname.startsWith('/admin')) {
     const { data: adminRecord } = await supabase
-      .from('admins')
-      .select('id')
-      .eq('email', user.email)
-      .single()
-
+      .from('admins').select('id').eq('email', user.email).single()
     if (!adminRecord) {
       return NextResponse.redirect(new URL('/dashboard', request.url))
     }
   }
 
-  // Vérification is_active pour les boîtes
+  // Protection /dashboard → vérifier statut venue
   if (user && pathname.startsWith('/dashboard')) {
     const { data: venue } = await supabase
-      .from('venues')
-      .select('is_active')
-      .eq('user_id', user.id)
-      .single()
+      .from('venues').select('status').eq('user_id', user.id).single()
 
-    if (venue && venue.is_active === false) {
+    if (venue?.status === 'suspended') {
       return NextResponse.redirect(new URL('/suspended', request.url))
+    }
+    if (venue?.status === 'paused') {
+      return NextResponse.redirect(new URL('/paused', request.url))
     }
   }
 
