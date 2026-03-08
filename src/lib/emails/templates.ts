@@ -278,7 +278,7 @@ export function waitlistNotificationEmail({
           </div>
         `).join('')}
       </div>
-    </div>
+    </div> 
 
     <div style="text-align:center;margin:24px 0;">
       <a href="${reservationLink}"
