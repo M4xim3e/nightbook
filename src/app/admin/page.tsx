@@ -73,6 +73,16 @@ export default function AdminPage() {
             <h1 className="text-2xl font-bold text-white">NightBook Admin</h1>
           </div>
           <p className="text-zinc-500 text-sm ml-11">Gestion des etablissements</p>
+          </div>
+          <button
+            onClick={async () => {
+              const supabase = createClient()
+              await supabase.auth.signOut()
+              window.location.href = '/login'
+            }}
+            className="flex items-center gap-2 border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500 px-4 py-2.5 rounded-xl text-sm transition">
+            <span>Déconnexion</span>
+          </button>
         </div>
 
         <div className="grid grid-cols-4 gap-3 mb-8">
