@@ -9,17 +9,9 @@ export default function SuspendedPage() {
           Accès suspendu
         </h1>
         <p className="text-zinc-400 text-sm leading-relaxed">
-          Votre accès à NightBook a été suspendu. Contactez-nous pour régulariser votre situation.
+          Votre accès à NightBook a été suspendu. Contactez-nous à contact@nightbook.fr pour régulariser votre situation.
         </p>
-        <div className="mt-6">
-          
-            href="mailto:contact@nightbook.fr"
-            className="inline-block bg-purple-600 hover:bg-purple-700 text-white font-semibold px-6 py-3 rounded-xl transition text-sm"
-          >
-            Nous contacter
-          </a>
-        </div>
       </div>
     </div>
   )
-} 
+}
