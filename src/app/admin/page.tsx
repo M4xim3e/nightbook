@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import { CheckCircle, XCircle, PauseCircle, Building2 } from 'lucide-react'
+import { CheckCircle, XCircle, PauseCircle, Building2, LogOut } from 'lucide-react'
 
 type Venue = {
   id: string
@@ -33,6 +33,11 @@ export default function AdminPage() {
     const { data } = await supabase.from('venues').select('*').order('created_at', { ascending: false })
     setVenues(data || [])
     setLoading(false)
+  }
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+    router.push('/login')
   }
 
   const setStatus = async (venue: Venue, newStatus: string) => {
@@ -65,26 +70,32 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-black px-4 py-12">
       <div className="max-w-4xl mx-auto">
-        <div className="mb-10">
-          <div className="flex items-center gap-3 mb-1">
-            <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
-              <span className="text-sm">👑</span>
+
+        {/* Header */}
+        <div className="flex items-center justify-between mb-10">
+          <div>
+            <div className="flex items-center gap-3 mb-1">
+              <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+                <span className="text-sm">👑</span>
+              </div>
+              <h1 className="text-2xl font-bold text-white">NightBook Admin</h1>
             </div>
-            <h1 className="text-2xl font-bold text-white">NightBook Admin</h1>
+            <p className="text-zinc-500 text-sm ml-11">Gestion des etablissements</p>
           </div>
-          <p className="text-zinc-500 text-sm ml-11">Gestion des etablissements</p>
+          <div className="flex items-center gap-3">
+            <a href="/admin/prospects"
+              className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition">
+              📣 Prospection
+            </a>
+            <button onClick={handleLogout}
+              className="flex items-center gap-2 border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500 px-4 py-2.5 rounded-xl text-sm transition">
+              <LogOut size={15} />
+              Déconnexion
+            </button>
           </div>
-          <button
-            onClick={async () => {
-              const supabase = createClient()
-              await supabase.auth.signOut()
-              window.location.href = '/login'
-            }}
-            className="flex items-center gap-2 border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500 px-4 py-2.5 rounded-xl text-sm transition">
-            <span>Déconnexion</span>
-          </button>
         </div>
 
+        {/* Stats */}
         <div className="grid grid-cols-4 gap-3 mb-8">
           {[
             { label: 'Total', value: stats.total, icon: Building2, color: 'text-white' },
@@ -102,6 +113,7 @@ export default function AdminPage() {
           ))}
         </div>
 
+        {/* Liste venues */}
         <div className="space-y-3">
           {venues.map(venue => {
             const cfg = statusConfig[venue.status] || statusConfig.active
@@ -146,6 +158,7 @@ export default function AdminPage() {
             )
           })}
         </div>
+
       </div>
     </div>
   )
