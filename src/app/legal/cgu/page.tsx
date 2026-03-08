@@ -10,7 +10,7 @@ export default function CGUPage() {
           <section>
             <h2 className="text-white font-semibold text-lg mb-3">Article 1 — Définitions</h2>
             <ul className="space-y-1">
-              <li><strong className="text-white">« NightBook »</strong> : la plateforme SaaS éditée par [NOM PRÉNOM]</li>
+              <li><strong className="text-white">« NightBook »</strong> : la plateforme SaaS éditée par Maxime ECK</li>
               <li><strong className="text-white">« Établissement »</strong> : toute boîte de nuit, club ou bar ayant souscrit un abonnement</li>
               <li><strong className="text-white">« Client final »</strong> : toute personne physique effectuant une réservation via la page publique d'un Établissement</li>
               <li><strong className="text-white">« Service »</strong> : l'ensemble des fonctionnalités de NightBook</li>
@@ -76,7 +76,7 @@ export default function CGUPage() {
           <section>
             <h2 className="text-white font-semibold text-lg mb-3">Article 9 — Droit applicable</h2>
             <p>
-              Les présentes CGU sont soumises au droit français. Tout litige sera soumis à la compétence exclusive des tribunaux de [VILLE].
+              Les présentes CGU sont soumises au droit français. Tout litige sera soumis à la compétence exclusive des tribunaux de Nantes.
             </p>
           </section>
 

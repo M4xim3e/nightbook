@@ -43,7 +43,17 @@ export default function AdminPage() {
   const setStatus = async (venue: Venue, newStatus: string) => {
     const labels: Record<string, string> = { active: 'activer', paused: 'mettre en pause', suspended: 'suspendre' }
     if (!confirm(`Voulez-vous ${labels[newStatus]} "${venue.name}" ?`)) return
-    await supabase.from('venues').update({ status: newStatus }).eq('id', venue.id)
+
+    const res = await fetch('/api/admin/set-status', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ venueId: venue.id, status: newStatus }),
+    })
+
+    if (!res.ok) {
+      alert('Erreur lors de la mise à jour du statut')
+      return
+    }
     await loadData()
   }
 

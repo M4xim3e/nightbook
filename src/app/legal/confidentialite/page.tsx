@@ -10,9 +10,9 @@ export default function ConfidentialitePage() {
           <section>
             <h2 className="text-white font-semibold text-lg mb-3">1. Responsable du traitement</h2>
             <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 space-y-1">
-              <p><span className="text-zinc-500">Nom :</span> [NOM PRÉNOM]</p>
-              <p><span className="text-zinc-500">SIRET :</span> [NUMÉRO SIRET]</p>
-              <p><span className="text-zinc-500">Email :</span> [EMAIL DE CONTACT]</p>
+              <p><span className="text-zinc-500">Nom :</span> Maxime ECK</p>
+              <p><span className="text-zinc-500">SIRET :</span> En cours d'immatriculation</p>
+              <p><span className="text-zinc-500">Email :</span> maximeeck14@gmail.com</p>
             </div>
           </section>
 
@@ -103,7 +103,7 @@ export default function ConfidentialitePage() {
               <li><strong className="text-white">Droit à la portabilité</strong> : recevoir vos données dans un format structuré</li>
             </ul>
             <p className="mt-3">
-              Pour exercer vos droits, contactez-nous à : <span className="text-purple-400">[EMAIL DE CONTACT]</span>. Nous nous engageons à répondre dans un délai de 30 jours.
+              Pour exercer vos droits, contactez-nous à : <span className="text-purple-400">maximeeck14@gmail.com</span>. Nous nous engageons à répondre dans un délai de 30 jours.
             </p>
             <p className="mt-2">
               Vous pouvez également introduire une réclamation auprès de la <a href="https://www.cnil.fr" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:text-purple-300">CNIL</a>.

@@ -10,7 +10,7 @@ export default function CGVPage() {
           <section>
             <h2 className="text-white font-semibold text-lg mb-3">Article 1 — Objet</h2>
             <p>
-              Les présentes Conditions Générales de Vente (CGV) régissent les relations contractuelles entre NightBook ([NOM PRÉNOM], [SIRET]) et tout établissement (ci-après « le Client ») souscrivant à l'abonnement NightBook, plateforme SaaS de gestion des réservations VIP.
+              Les présentes Conditions Générales de Vente (CGV) régissent les relations contractuelles entre NightBook (Maxime ECK, en cours d'immatriculation) et tout établissement (ci-après « le Client ») souscrivant à l'abonnement NightBook, plateforme SaaS de gestion des réservations VIP.
             </p>
           </section>
 
@@ -82,7 +82,7 @@ export default function CGVPage() {
           <section>
             <h2 className="text-white font-semibold text-lg mb-3">Article 9 — Contact</h2>
             <p>
-              Pour toute question relative aux présentes CGV : <span className="text-purple-400">[EMAIL DE CONTACT]</span>
+              Pour toute question relative aux présentes CGV : <span className="text-purple-400">maximeeck14@gmail.com</span>
             </p>
           </section>
 

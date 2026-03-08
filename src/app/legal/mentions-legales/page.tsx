@@ -10,11 +10,11 @@ export default function MentionsLegalesPage() {
           <section>
             <h2 className="text-white font-semibold text-lg mb-3">Éditeur du site</h2>
             <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 space-y-1 text-sm">
-              <p><span className="text-zinc-500">Nom :</span> [NOM PRÉNOM]</p>
-              <p><span className="text-zinc-500">Statut :</span> Auto-entrepreneur / [STATUT JURIDIQUE]</p>
-              <p><span className="text-zinc-500">SIRET :</span> [NUMÉRO SIRET]</p>
-              <p><span className="text-zinc-500">Adresse :</span> [ADRESSE COMPLÈTE]</p>
-              <p><span className="text-zinc-500">Email :</span> [EMAIL DE CONTACT]</p>
+              <p><span className="text-zinc-500">Nom :</span> Maxime ECK</p>
+              <p><span className="text-zinc-500">Statut :</span> Auto-entrepreneur (immatriculation en cours)</p>
+              <p><span className="text-zinc-500">SIRET :</span> En cours d'immatriculation</p>
+              <p><span className="text-zinc-500">Adresse :</span> 244 rue de Nantes</p>
+              <p><span className="text-zinc-500">Email :</span> maximeeck14@gmail.com</p>
             </div>
           </section>
 
@@ -44,7 +44,7 @@ export default function MentionsLegalesPage() {
           <section>
             <h2 className="text-white font-semibold text-lg mb-3">Contact</h2>
             <p className="text-sm">
-              Pour toute question, contactez-nous à : <span className="text-purple-400">[EMAIL DE CONTACT]</span>
+              Pour toute question, contactez-nous à : <span className="text-purple-400">maximeeck14@gmail.com</span>
             </p>
           </section>
 
