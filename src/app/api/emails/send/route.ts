@@ -52,7 +52,6 @@ export async function POST(request: NextRequest) {
       specialRequest: reservation.special_request,
       cancellationLink,
       cancellationDeadline,
-      qrCodeUrl: reservation.qr_code || undefined,
     })
 
     await resend.emails.send({
