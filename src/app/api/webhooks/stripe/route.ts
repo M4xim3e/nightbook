@@ -27,11 +27,9 @@ export async function POST(request: NextRequest) {
     const reservationId = session.metadata?.reservation_id
 
     if (reservationId) {
-      const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${reservationId}&bgcolor=18181b&color=ffffff&qzone=2`
       await supabase.from('reservations').update({
         status: 'confirmed',
         stripe_payment_status: 'succeeded',
-        qr_code: qrCodeUrl,
       }).eq('id', reservationId)
 
       await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/emails/send`, {
@@ -41,14 +39,13 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // ── ABONNEMENT SOUSCRIT (fin du trial ou paiement immédiat)
+    // Abonnement souscrit
     if (session.mode === 'subscription' && session.customer) {
-      const customerId = session.customer as string
       await supabase.from('venues').update({
         status: 'active',
         subscription_id: session.subscription as string,
         subscription_status: 'active',
-      }).eq('stripe_customer_id', customerId)
+      }).eq('stripe_customer_id', session.customer as string)
     }
   }
 
@@ -63,38 +60,30 @@ export async function POST(request: NextRequest) {
   }
 
   // ── ABONNEMENTS ───────────────────────────────────────────
-
-  // Abonnement actif (trial démarré ou renouvelé)
   if (event.type === 'customer.subscription.updated') {
     const sub = event.data.object as Stripe.Subscription
-    const customerId = sub.customer as string
     const isActive = sub.status === 'active' || sub.status === 'trialing'
-
     await supabase.from('venues').update({
       subscription_id: sub.id,
       subscription_status: sub.status,
       status: isActive ? 'active' : 'paused',
-    }).eq('stripe_customer_id', customerId)
+    }).eq('stripe_customer_id', sub.customer as string)
   }
 
-  // Paiement échoué → pause automatique
   if (event.type === 'invoice.payment_failed') {
     const invoice = event.data.object as Stripe.Invoice
-    const customerId = invoice.customer as string
     await supabase.from('venues').update({
       status: 'paused',
       subscription_status: 'past_due',
-    }).eq('stripe_customer_id', customerId)
+    }).eq('stripe_customer_id', invoice.customer as string)
   }
 
-  // Abonnement résilié → pause
   if (event.type === 'customer.subscription.deleted') {
     const sub = event.data.object as Stripe.Subscription
-    const customerId = sub.customer as string
     await supabase.from('venues').update({
       status: 'paused',
       subscription_status: 'canceled',
-    }).eq('stripe_customer_id', customerId)
+    }).eq('stripe_customer_id', sub.customer as string)
   }
 
   return NextResponse.json({ received: true })
