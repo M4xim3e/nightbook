@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import { CheckCircle, XCircle, PauseCircle, Building2 } from 'lucide-react'
 
 type Venue = {
   id: string
@@ -13,15 +14,10 @@ type Venue = {
   created_at: string
 }
 
-const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string; dot: string }> = {
-  active:    { label: 'Actif',     bg: 'rgba(22,163,74,0.1)',   text: '#22c55e', dot: '#22c55e' },
-  paused:    { label: 'En pause',  bg: 'rgba(234,179,8,0.1)',   text: '#eab308', dot: '#eab308' },
-  suspended: { label: 'Suspendu',  bg: 'rgba(220,38,38,0.1)',   text: '#ef4444', dot: '#ef4444' },
-}
-
 export default function AdminPage() {
   const [venues, setVenues] = useState<Venue[]>([])
   const [loading, setLoading] = useState(true)
+  const [isAdmin, setIsAdmin] = useState(false)
   const supabase = createClient()
   const router = useRouter()
 
@@ -30,15 +26,11 @@ export default function AdminPage() {
   const loadData = async () => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { router.push('/login'); return }
-
     const { data: adminRecord } = await supabase
       .from('admins').select('id').eq('email', user.email).single()
     if (!adminRecord) { router.push('/dashboard'); return }
-
-    const { data } = await supabase
-      .from('venues').select('id,name,slug,city,status,created_at')
-      .order('created_at', { ascending: false })
-
+    setIsAdmin(true)
+    const { data } = await supabase.from('venues').select('*').order('created_at', { ascending: false })
     setVenues(data || [])
     setLoading(false)
   }
@@ -46,7 +38,7 @@ export default function AdminPage() {
   const setStatus = async (venue: Venue, newStatus: string) => {
     const labels: Record<string, string> = { active: 'activer', paused: 'mettre en pause', suspended: 'suspendre' }
     if (!confirm(`Voulez-vous ${labels[newStatus]} "${venue.name}" ?`)) return
-    await supabase.from('venues').update({ status: newStatus, is_active: newStatus === 'active' }).eq('id', venue.id)
+    await supabase.from('venues').update({ status: newStatus }).eq('id', venue.id)
     await loadData()
   }
 
@@ -57,85 +49,93 @@ export default function AdminPage() {
     suspended: venues.filter(v => v.status === 'suspended').length,
   }
 
-  const formatDate = (d: string) => new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
+  const statusConfig: Record<string, { label: string; color: string; bg: string }> = {
+    active: { label: 'Actif', color: 'text-green-400', bg: 'bg-green-500/10' },
+    paused: { label: 'En pause', color: 'text-yellow-400', bg: 'bg-yellow-500/10' },
+    suspended: { label: 'Suspendu', color: 'text-red-400', bg: 'bg-red-500/10' },
+  }
 
   if (loading) return (
-    <div style={{minHeight:'100vh',background:'#0a0a0a',display:'flex',alignItems:'center',justifyContent:'center'}}>
-      <p style={{color:'#71717a'}}>Chargement...</p>
+    <div className="min-h-screen bg-black flex items-center justify-center">
+      <p className="text-zinc-400">Chargement...</p>
     </div>
   )
+  if (!isAdmin) return null
 
   return (
-    <div style={{minHeight:'100vh',background:'#0a0a0a',padding:'40px 16px'}}>
-      <div style={{maxWidth:'860px',margin:'0 auto'}}>
-
-        <div style={{marginBottom:'32px'}}>
-          <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'4px'}}>
-            <div style={{width:'32px',height:'32px',background:'#7c3aed',borderRadius:'8px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'14px'}}>👑</div>
-            <h1 style={{color:'#fff',fontSize:'22px',fontWeight:'700',margin:0}}>NightBook Admin</h1>
+    <div className="min-h-screen bg-black px-4 py-12">
+      <div className="max-w-4xl mx-auto">
+        <div className="mb-10">
+          <div className="flex items-center gap-3 mb-1">
+            <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+              <span className="text-sm">👑</span>
+            </div>
+            <h1 className="text-2xl font-bold text-white">NightBook Admin</h1>
           </div>
-          <p style={{color:'#71717a',fontSize:'13px',margin:0}}>Gestion des etablissements</p>
+          <p className="text-zinc-500 text-sm ml-11">Gestion des etablissements</p>
         </div>
 
-        <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'12px',marginBottom:'28px'}}>
+        <div className="grid grid-cols-4 gap-3 mb-8">
           {[
-            { label: 'Total', value: stats.total, color: '#fff' },
-            { label: 'Actifs', value: stats.active, color: '#22c55e' },
-            { label: 'En pause', value: stats.paused, color: '#eab308' },
-            { label: 'Suspendus', value: stats.suspended, color: '#ef4444' },
-          ].map(({ label, value, color }) => (
-            <div key={label} style={{background:'#18181b',border:'1px solid #27272a',borderRadius:'12px',padding:'16px'}}>
-              <p style={{color:'#71717a',fontSize:'12px',margin:'0 0 4px'}}>{label}</p>
-              <p style={{color,fontSize:'24px',fontWeight:'700',margin:0}}>{value}</p>
+            { label: 'Total', value: stats.total, icon: Building2, color: 'text-white' },
+            { label: 'Actifs', value: stats.active, icon: CheckCircle, color: 'text-green-400' },
+            { label: 'En pause', value: stats.paused, icon: PauseCircle, color: 'text-yellow-400' },
+            { label: 'Suspendus', value: stats.suspended, icon: XCircle, color: 'text-red-400' },
+          ].map(({ label, value, icon: Icon, color }) => (
+            <div key={label} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-zinc-500 text-xs">{label}</span>
+                <Icon size={14} className={color} />
+              </div>
+              <p className={`text-2xl font-bold ${color}`}>{value}</p>
             </div>
           ))}
         </div>
 
-        <div style={{display:'flex',flexDirection:'column',gap:'8px'}}>
-          {venues.length === 0 ? (
-            <div style={{background:'#18181b',border:'1px solid #27272a',borderRadius:'12px',padding:'48px',textAlign:'center'}}>
-              <p style={{color:'#71717a'}}>Aucun etablissement inscrit</p>
-            </div>
-          ) : venues.map(venue => {
-            const cfg = STATUS_CONFIG[venue.status] || STATUS_CONFIG.active
+        <div className="space-y-3">
+          {venues.map(venue => {
+            const cfg = statusConfig[venue.status] || statusConfig.active
             return (
-              <div key={venue.id} style={{background:'#18181b',border:'1px solid #27272a',borderRadius:'12px',padding:'16px 20px',display:'flex',alignItems:'center',gap:'16px'}}>
-                <div style={{flex:1,minWidth:0}}>
-                  <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'4px'}}>
-                    <p style={{color:'#fff',fontWeight:'600',margin:0,fontSize:'14px'}}>{venue.name}</p>
-                    <span style={{background:cfg.bg,color:cfg.text,fontSize:'11px',fontWeight:'600',padding:'2px 8px',borderRadius:'20px'}}>
-                      {cfg.label}
-                    </span>
+              <div key={venue.id} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="text-white font-semibold truncate">{venue.name}</p>
+                      <span className={`text-xs px-2 py-0.5 rounded-full shrink-0 ${cfg.bg} ${cfg.color}`}>
+                        {cfg.label}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3 text-xs text-zinc-500">
+                      <span>/{venue.slug}</span>
+                      {venue.city && <span>📍 {venue.city}</span>}
+                      <span>Inscrit le {new Date(venue.created_at).toLocaleDateString('fr-FR')}</span>
+                    </div>
                   </div>
-                  <p style={{color:'#71717a',fontSize:'12px',margin:0}}>
-                    /{venue.slug}{venue.city ? ` · ${venue.city}` : ''} · {formatDate(venue.created_at)}
-                  </p>
-                </div>
-                <div style={{display:'flex',gap:'6px',flexShrink:0}}>
-                  {venue.status !== 'active' && (
-                    <button onClick={() => setStatus(venue, 'active')}
-                      style={{background:'rgba(22,163,74,0.1)',color:'#22c55e',border:'1px solid rgba(22,163,74,0.3)',borderRadius:'8px',padding:'6px 12px',fontSize:'12px',fontWeight:'600',cursor:'pointer'}}>
-                      Activer
-                    </button>
-                  )}
-                  {venue.status !== 'paused' && (
-                    <button onClick={() => setStatus(venue, 'paused')}
-                      style={{background:'rgba(234,179,8,0.1)',color:'#eab308',border:'1px solid rgba(234,179,8,0.3)',borderRadius:'8px',padding:'6px 12px',fontSize:'12px',fontWeight:'600',cursor:'pointer'}}>
-                      Pause
-                    </button>
-                  )}
-                  {venue.status !== 'suspended' && (
-                    <button onClick={() => setStatus(venue, 'suspended')}
-                      style={{background:'rgba(220,38,38,0.1)',color:'#ef4444',border:'1px solid rgba(220,38,38,0.3)',borderRadius:'8px',padding:'6px 12px',fontSize:'12px',fontWeight:'600',cursor:'pointer'}}>
-                      Suspendre
-                    </button>
-                  )}
+                  <div className="flex items-center gap-2 shrink-0">
+                    {venue.status !== 'active' && (
+                      <button onClick={() => setStatus(venue, 'active')}
+                        className="px-3 py-1.5 rounded-xl text-xs font-medium border border-green-500/30 text-green-400 hover:bg-green-500/10 transition">
+                        Activer
+                      </button>
+                    )}
+                    {venue.status !== 'paused' && (
+                      <button onClick={() => setStatus(venue, 'paused')}
+                        className="px-3 py-1.5 rounded-xl text-xs font-medium border border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10 transition">
+                        Pause
+                      </button>
+                    )}
+                    {venue.status !== 'suspended' && (
+                      <button onClick={() => setStatus(venue, 'suspended')}
+                        className="px-3 py-1.5 rounded-xl text-xs font-medium border border-red-500/30 text-red-400 hover:bg-red-500/10 transition">
+                        Suspendre
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             )
           })}
         </div>
-
       </div>
     </div>
   )
