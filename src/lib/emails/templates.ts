@@ -14,6 +14,7 @@ export function confirmationEmail({
   specialRequest,
   cancellationLink,
   cancellationDeadline,
+  qrCodeUrl,
 }: {
   clientName: string
   eventName: string
@@ -30,6 +31,7 @@ export function confirmationEmail({
   specialRequest?: string
   cancellationLink?: string
   cancellationDeadline?: string
+  qrCodeUrl?: string
 }) {
   return `
 <!DOCTYPE html>
@@ -99,7 +101,16 @@ export function confirmationEmail({
       <p style="color:#d4d4d8;font-size:13px;margin:0;">${dressCode}</p>
     </div>
     ` : ''}
-
+    ${qrCodeUrl ? `
+    <div style="text-align:center;margin-top:16px;margin-bottom:16px;">
+      <p style="color:#71717a;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin:0 0 12px;">🎫 Votre QR code d'entrée</p>
+      <div style="display:inline-block;background:#18181b;border:1px solid #27272a;border-radius:12px;padding:16px;">
+        <img src="${qrCodeUrl}" width="160" height="160" alt="QR Code" style="display:block;border-radius:8px;" />
+      </div>
+      <p style="color:#52525b;font-size:11px;margin:8px 0 0;">Présentez ce QR code à l'entrée</p>
+    </div>
+    ` : ''}
+    
     ${cancellationLink ? `
     <div style="text-align:center;margin-top:8px;margin-bottom:16px;">
       <p style="color:#52525b;font-size:12px;margin:0 0 6px;">
