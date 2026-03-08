@@ -5,7 +5,6 @@ const supabase = createClient(
   Deno.env.get('SUPABASE_URL')!,
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 )
-
 const resend = new Resend(Deno.env.get('RESEND_API_KEY')!)
 
 function reminderEmail({ clientName, eventName, eventDate, eventTime, tableName, venueName, venueAddress, venueCity, dressCode, arrivalInfo, guestCount }: {
@@ -42,13 +41,11 @@ function reminderEmail({ clientName, eventName, eventDate, eventTime, tableName,
         `).join('')}
       </div>
     </div>
-    ${arrivalInfo ? `
-    <div style="background:#18181b;border:1px solid #27272a;border-radius:12px;padding:20px;margin-bottom:16px;">
+    ${arrivalInfo ? `<div style="background:#18181b;border:1px solid #27272a;border-radius:12px;padding:20px;margin-bottom:16px;">
       <p style="color:#71717a;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin:0 0 8px;">📍 Infos arrivée</p>
       <p style="color:#d4d4d8;font-size:13px;margin:0;">${arrivalInfo}</p>
     </div>` : ''}
-    ${dressCode ? `
-    <div style="background:#18181b;border:1px solid #27272a;border-radius:12px;padding:20px;margin-bottom:16px;">
+    ${dressCode ? `<div style="background:#18181b;border:1px solid #27272a;border-radius:12px;padding:20px;margin-bottom:16px;">
       <p style="color:#71717a;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin:0 0 8px;">👔 Dress code</p>
       <p style="color:#d4d4d8;font-size:13px;margin:0;">${dressCode}</p>
     </div>` : ''}
@@ -61,17 +58,31 @@ function reminderEmail({ clientName, eventName, eventDate, eventTime, tableName,
 }
 
 Deno.serve(async (req) => {
-  // Sécurité : vérifier le header Authorization
   const authHeader = req.headers.get('Authorization')
   if (authHeader !== `Bearer ${Deno.env.get('CRON_SECRET')}`) {
     return new Response('Unauthorized', { status: 401 })
   }
 
   try {
-    // Chercher les réservations confirmées dont la soirée est dans les prochaines 24h
     const now = new Date()
     const in24h = new Date(now.getTime() + 24 * 60 * 60 * 1000)
 
+    // ── 1. Passer les réservations confirmées des soirées passées à "attended"
+    const yesterday = new Date(now)
+    yesterday.setDate(yesterday.getDate() - 1)
+    const yesterdayStr = yesterday.toISOString().split('T')[0]
+
+    await supabase
+      .from('reservations')
+      .update({ status: 'attended' })
+      .eq('status', 'confirmed')
+      .is('deleted_at', null)
+      .lt('event_tables.events.date', yesterdayStr)
+
+    // Via SQL direct pour contourner la limitation des joins sur update
+    await supabase.rpc('mark_attended_reservations')
+
+    // ── 2. Envoyer les rappels J-1
     const { data: reservations, error } = await supabase
       .from('reservations')
       .select('*, event_tables(*, vip_tables(name), events(name, date, start_time)), venues(name, address, city, dress_code, arrival_info)')
@@ -82,49 +93,37 @@ Deno.serve(async (req) => {
     if (error) throw error
 
     let sent = 0
-
     for (const reservation of reservations || []) {
       const eventDate = reservation.event_tables?.events?.date
       if (!eventDate) continue
-
-      // Construire la date/heure complète de la soirée
       const startTime = reservation.event_tables?.events?.start_time || '23:00:00'
       const eventDateTime = new Date(`${eventDate}T${startTime}`)
 
-      // Envoyer si la soirée est entre maintenant et dans 24h
       if (eventDateTime > now && eventDateTime <= in24h) {
         const formattedDate = new Date(eventDate).toLocaleDateString('fr-FR', {
           weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
-        })
-        const formattedTime = startTime.slice(0, 5)
-
-        const html = reminderEmail({
-          clientName: reservation.client_name,
-          eventName: reservation.event_tables?.events?.name || '',
-          eventDate: formattedDate,
-          eventTime: formattedTime,
-          tableName: reservation.event_tables?.vip_tables?.name || '',
-          venueName: reservation.venues?.name || '',
-          venueAddress: reservation.venues?.address,
-          venueCity: reservation.venues?.city,
-          dressCode: reservation.venues?.dress_code,
-          arrivalInfo: reservation.venues?.arrival_info,
-          guestCount: reservation.guest_count,
         })
 
         await resend.emails.send({
           from: 'NightBook <onboarding@resend.dev>',
           to: reservation.client_email,
           subject: `🎉 C'est ce soir — ${reservation.event_tables?.events?.name}`,
-          html,
+          html: reminderEmail({
+            clientName: reservation.client_name,
+            eventName: reservation.event_tables?.events?.name || '',
+            eventDate: formattedDate,
+            eventTime: startTime.slice(0, 5),
+            tableName: reservation.event_tables?.vip_tables?.name || '',
+            venueName: reservation.venues?.name || '',
+            venueAddress: reservation.venues?.address,
+            venueCity: reservation.venues?.city,
+            dressCode: reservation.venues?.dress_code,
+            arrivalInfo: reservation.venues?.arrival_info,
+            guestCount: reservation.guest_count,
+          }),
         })
 
-        // Marquer comme envoyé
-        await supabase
-          .from('reservations')
-          .update({ reminder_sent: true })
-          .eq('id', reservation.id)
-
+        await supabase.from('reservations').update({ reminder_sent: true }).eq('id', reservation.id)
         sent++
       }
     }
@@ -135,8 +134,7 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error('Reminder error:', error)
     return new Response(JSON.stringify({ error: String(error) }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
+      status: 500, headers: { 'Content-Type': 'application/json' }
     })
   }
 })
