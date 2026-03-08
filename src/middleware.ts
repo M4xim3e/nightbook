@@ -24,30 +24,43 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   const pathname = request.nextUrl.pathname
 
+  // Non connecté → login
   if (!user && (pathname.startsWith('/dashboard') || pathname.startsWith('/admin'))) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  if (user && (pathname === '/login' || pathname === '/register')) {
+  if (user) {
+    // Vérifier si admin à chaque fois
     const { data: adminRecord } = await supabase
       .from('admins').select('id').eq('email', user.email).single()
-    return NextResponse.redirect(new URL(adminRecord ? '/admin' : '/dashboard', request.url))
-  }
 
-  if (user && pathname.startsWith('/admin')) {
-    const { data: adminRecord } = await supabase
-      .from('admins').select('id').eq('email', user.email).single()
-    if (!adminRecord) return NextResponse.redirect(new URL('/dashboard', request.url))
-  }
+    const isAdmin = !!adminRecord
 
-  if (user && pathname.startsWith('/dashboard')) {
-    const { data: venue } = await supabase
-      .from('venues').select('status').eq('user_id', user.id).single()
-    if (venue?.status === 'suspended') {
-      return NextResponse.redirect(new URL('/suspended', request.url))
+    // Admin qui essaie d'aller sur /dashboard → redirigé vers /admin
+    if (isAdmin && pathname.startsWith('/dashboard')) {
+      return NextResponse.redirect(new URL('/admin', request.url))
     }
-    if (venue?.status === 'paused') {
-      return NextResponse.redirect(new URL('/paused', request.url))
+
+    // Admin ou boîte connectée sur /login ou /register → bonne redirection
+    if (pathname === '/login' || pathname === '/register') {
+      return NextResponse.redirect(new URL(isAdmin ? '/admin' : '/dashboard', request.url))
+    }
+
+    // Non-admin qui essaie d'aller sur /admin → redirigé vers /dashboard
+    if (!isAdmin && pathname.startsWith('/admin')) {
+      return NextResponse.redirect(new URL('/dashboard', request.url))
+    }
+
+    // Boîte avec statut paused ou suspended
+    if (!isAdmin && pathname.startsWith('/dashboard')) {
+      const { data: venue } = await supabase
+        .from('venues').select('status').eq('user_id', user.id).single()
+      if (venue?.status === 'suspended') {
+        return NextResponse.redirect(new URL('/suspended', request.url))
+      }
+      if (venue?.status === 'paused') {
+        return NextResponse.redirect(new URL('/paused', request.url))
+      }
     }
   }
 
