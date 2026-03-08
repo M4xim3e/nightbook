@@ -24,32 +24,25 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   const pathname = request.nextUrl.pathname
 
-  // Non connecté → login
   if (!user && (pathname.startsWith('/dashboard') || pathname.startsWith('/admin'))) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  // Déjà connecté → ne pas rester sur login/register
   if (user && (pathname === '/login' || pathname === '/register')) {
     const { data: adminRecord } = await supabase
       .from('admins').select('id').eq('email', user.email).single()
     return NextResponse.redirect(new URL(adminRecord ? '/admin' : '/dashboard', request.url))
   }
 
-  // Protection /admin → réservé aux admins
   if (user && pathname.startsWith('/admin')) {
     const { data: adminRecord } = await supabase
       .from('admins').select('id').eq('email', user.email).single()
-    if (!adminRecord) {
-      return NextResponse.redirect(new URL('/dashboard', request.url))
-    }
+    if (!adminRecord) return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
-  // Protection /dashboard → vérifier statut venue
   if (user && pathname.startsWith('/dashboard')) {
     const { data: venue } = await supabase
       .from('venues').select('status').eq('user_id', user.id).single()
-
     if (venue?.status === 'suspended') {
       return NextResponse.redirect(new URL('/suspended', request.url))
     }
