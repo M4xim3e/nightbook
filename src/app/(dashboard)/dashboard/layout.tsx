@@ -1,19 +1,11 @@
 'use client'
-
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import {
-  LayoutDashboard,
-  CalendarDays,
-  Wine,
-  Armchair,
-  Settings,
-  LogOut,
-  Menu,
-  X,
-  Users
+  LayoutDashboard, CalendarDays, Wine, Armchair,
+  Settings, LogOut, Menu, X, Users
 } from 'lucide-react'
 
 const navItems = [
@@ -28,6 +20,7 @@ const navItems = [
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [venueName, setVenueName] = useState('')
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [ready, setReady] = useState(false)
   const router = useRouter()
   const pathname = usePathname()
   const supabase = createClient()
@@ -36,12 +29,31 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const getVenue = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
+
       const { data } = await supabase
         .from('venues')
-        .select('name')
+        .select('name, subscription_status, trial_ends_at')
         .eq('user_id', user.id)
         .single()
-      if (data) setVenueName(data.name)
+
+      if (!data) return
+
+      setVenueName(data.name)
+
+      // Vérifier si l'abonnement est valide
+      const hasActiveSubscription =
+        data.subscription_status === 'active' ||
+        data.subscription_status === 'trialing'
+
+      const trialEndsAt = data.trial_ends_at ? new Date(data.trial_ends_at) : null
+      const trialValid = trialEndsAt && trialEndsAt > new Date()
+
+      if (!hasActiveSubscription && !trialValid) {
+        router.push('/subscribe')
+        return
+      }
+
+      setReady(true)
     }
     getVenue()
   }, [])
@@ -57,7 +69,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <h1 className="text-xl font-bold text-white">NightBook</h1>
         <p className="text-zinc-400 text-sm mt-1 truncate">{venueName}</p>
       </div>
-
       <nav className="flex-1 p-4 space-y-1">
         {navItems.map(({ href, label, icon: Icon }) => {
           const active = pathname === href
@@ -67,9 +78,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               href={href}
               onClick={() => setMobileOpen(false)}
               className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition ${
-                active
-                  ? 'bg-purple-600 text-white'
-                  : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
+                active ? 'bg-purple-600 text-white' : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
               }`}
             >
               <Icon size={18} />
@@ -78,7 +87,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           )
         })}
       </nav>
-
       <div className="p-4 border-t border-zinc-800">
         <button
           onClick={handleLogout}
@@ -91,14 +99,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     </div>
   )
 
+  if (!ready) return (
+    <div className="min-h-screen bg-black flex items-center justify-center">
+      <p className="text-zinc-500 text-sm">Chargement...</p>
+    </div>
+  )
+
   return (
     <div className="min-h-screen bg-black flex">
-      {/* Sidebar desktop */}
       <aside className="hidden md:flex w-64 bg-zinc-900 border-r border-zinc-800 flex-col fixed h-full">
         <Sidebar />
       </aside>
-
-      {/* Sidebar mobile */}
       {mobileOpen && (
         <div className="fixed inset-0 z-50 md:hidden">
           <div className="absolute inset-0 bg-black/60" onClick={() => setMobileOpen(false)} />
@@ -107,17 +118,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </aside>
         </div>
       )}
-
-      {/* Main content */}
       <main className="flex-1 md:ml-64">
-        {/* Top bar mobile */}
         <div className="md:hidden flex items-center justify-between px-4 py-4 border-b border-zinc-800 bg-zinc-900">
           <h1 className="text-white font-bold">NightBook</h1>
           <button onClick={() => setMobileOpen(!mobileOpen)} className="text-white">
             {mobileOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
         </div>
-
         <div className="p-6">
           {children}
         </div>
