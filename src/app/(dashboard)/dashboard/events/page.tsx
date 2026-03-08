@@ -106,7 +106,7 @@ export default function EventsPage() {
         .filter(et => et.event_id === event.id)
         .map(et => ({
           ...et,
-          vip_tables: et.vip_tables as { name: string; min_spending: number } | null,
+          vip_tables: et.vip_tables as unknown as { name: string; min_spending: number } | null,
           reservationCount: resCounts[et.id] || 0,
         })),
     }))
