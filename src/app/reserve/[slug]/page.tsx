@@ -127,8 +127,19 @@ export default function ReservePage() {
   const handleSubmit = async () => {
     setSubmitting(true)
     setError('')
-    if (!clientName || !clientEmail) {
-      setError('Nom et email obligatoires')
+    const nameParts = clientName.trim().split(/\s+/)
+    if (!clientName.trim() || nameParts.length < 2) {
+      setError('Veuillez renseigner votre prénom et nom de famille')
+      setSubmitting(false)
+      return
+    }
+    if (!clientEmail) {
+      setError('Adresse email obligatoire')
+      setSubmitting(false)
+      return
+    }
+    if (!clientPhone.trim()) {
+      setError('Numéro de téléphone obligatoire')
       setSubmitting(false)
       return
     }
@@ -263,7 +274,7 @@ export default function ReservePage() {
 
             <div className="space-y-4">
               <div>
-                <label className="text-sm text-zinc-400 mb-1 block">Nom complet *</label>
+                <label className="text-sm text-zinc-400 mb-1 block">Nom complet * <span className="text-zinc-600 font-normal">(prénom et nom)</span></label>
                 <input value={waitlistName} onChange={e => setWaitlistName(e.target.value)}
                   className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 transition"
                   placeholder="Jean Dupont" />
@@ -275,7 +286,7 @@ export default function ReservePage() {
                   placeholder="jean@email.com" />
               </div>
               <div>
-                <label className="text-sm text-zinc-400 mb-1 block">Téléphone</label>
+                <label className="text-sm text-zinc-400 mb-1 block">Téléphone *</label>
                 <input type="tel" value={waitlistPhone} onChange={e => setWaitlistPhone(e.target.value)}
                   className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 transition"
                   placeholder="+33 6 00 00 00 00" />
@@ -507,7 +518,7 @@ export default function ReservePage() {
 
             <div className="space-y-4">
               <div>
-                <label className="text-sm text-zinc-400 mb-1 block">Nom complet *</label>
+                <label className="text-sm text-zinc-400 mb-1 block">Nom complet * <span className="text-zinc-600 font-normal">(prénom et nom)</span></label>
                 <input value={clientName} onChange={e => setClientName(e.target.value)}
                   className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 transition"
                   placeholder="Jean Dupont" />
@@ -519,19 +530,26 @@ export default function ReservePage() {
                   placeholder="jean@email.com" />
               </div>
               <div>
-                <label className="text-sm text-zinc-400 mb-1 block">Téléphone</label>
+                <label className="text-sm text-zinc-400 mb-1 block">Téléphone *</label>
                 <input type="tel" value={clientPhone} onChange={e => setClientPhone(e.target.value)}
                   className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 transition"
                   placeholder="+33 6 00 00 00 00" />
               </div>
               <div>
-                <label className="text-sm text-zinc-400 mb-1 block">Nombre de personnes</label>
+                <label className="text-sm text-zinc-400 mb-1 block">
+                  Nombre de personnes
+                  {selectedTable?.vip_tables?.capacity && (
+                    <span className="text-zinc-600 font-normal ml-1">(max {selectedTable.vip_tables.capacity})</span>
+                  )}
+                </label>
                 <div className="flex items-center gap-4">
                   <button onClick={() => setGuestCount(Math.max(1, guestCount - 1))}
                     className="w-10 h-10 rounded-full bg-zinc-800 text-white flex items-center justify-center hover:bg-zinc-700 transition">-</button>
                   <span className="text-white font-semibold text-lg">{guestCount}</span>
-                  <button onClick={() => setGuestCount(guestCount + 1)}
-                    className="w-10 h-10 rounded-full bg-purple-600 text-white flex items-center justify-center hover:bg-purple-700 transition">+</button>
+                  <button
+                    onClick={() => setGuestCount(g => selectedTable?.vip_tables?.capacity ? Math.min(selectedTable.vip_tables.capacity, g + 1) : g + 1)}
+                    disabled={!!selectedTable?.vip_tables?.capacity && guestCount >= selectedTable.vip_tables.capacity}
+                    className="w-10 h-10 rounded-full bg-purple-600 text-white flex items-center justify-center hover:bg-purple-700 transition disabled:opacity-40 disabled:cursor-not-allowed">+</button>
                 </div>
               </div>
               <div>

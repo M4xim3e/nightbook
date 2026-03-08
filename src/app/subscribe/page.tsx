@@ -65,6 +65,17 @@ export default function SubscribePage() {
             Aucun prelevement pendant 14 jours · Resiliable a tout moment
           </p>
         </div>
+
+        <div className="text-center mt-6 flex items-center justify-center gap-4 text-xs text-zinc-700">
+          <a href="/legal/cgv" className="hover:text-zinc-500 transition">CGV</a>
+          <span>·</span>
+          <a href="/legal/cgu" className="hover:text-zinc-500 transition">CGU</a>
+          <span>·</span>
+          <a href="/legal/confidentialite" className="hover:text-zinc-500 transition">Confidentialité</a>
+          <span>·</span>
+          <a href="/legal/mentions-legales" className="hover:text-zinc-500 transition">Mentions légales</a>
+        </div>
+
       </div>
     </div>
   )

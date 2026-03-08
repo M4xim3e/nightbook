@@ -101,11 +101,11 @@ export function confirmationEmail({
     ` : ''}
 
     ${cancellationLink ? `
-    <div style="text-align:center;margin-top:8px;margin-bottom:16px;">
-      <p style="color:#52525b;font-size:12px;margin:0 0 6px;">
+    <div style="text-align:center;margin-top:16px;margin-bottom:16px;">
+      <p style="color:#52525b;font-size:12px;margin:0 0 12px;">
         Annulation possible jusqu'au ${cancellationDeadline || ''}
       </p>
-      <a href="${cancellationLink}" style="color:#ef4444;font-size:12px;text-decoration:underline;">
+      <a href="${cancellationLink}" style="display:inline-block;background:#ef444415;border:1px solid #ef444440;color:#ef4444;font-size:14px;font-weight:600;text-decoration:none;padding:12px 28px;border-radius:10px;">
         Annuler ma réservation
       </a>
     </div>

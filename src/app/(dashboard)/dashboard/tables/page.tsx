@@ -17,6 +17,67 @@ type VipTable = {
 
 const emptyForm = { name: '', capacity: '', min_spending: '', max_reservations: '', description: '', auto_assign: true }
 
+type FormType = typeof emptyForm
+type SetForm = (fn: (prev: FormType) => FormType) => void
+
+function FormFields({ f, setF }: { f: FormType; setF: SetForm }) {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <label className="text-sm text-zinc-400 mb-1 block">Nom du carré *</label>
+        <input value={f.name} onChange={e => setF(p => ({ ...p, name: e.target.value }))}
+          className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 transition"
+          placeholder="Carré Gold, Carré VIP 1..." />
+      </div>
+      <div>
+        <label className="text-sm text-zinc-400 mb-1 block">Minimum spending (€) *</label>
+        <input type="number" value={f.min_spending} onChange={e => setF(p => ({ ...p, min_spending: e.target.value }))}
+          className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 transition"
+          placeholder="400" />
+      </div>
+      <div>
+        <label className="text-sm text-zinc-400 mb-1 block">Capacité (personnes)</label>
+        <input type="number" value={f.capacity} onChange={e => setF(p => ({ ...p, capacity: e.target.value }))}
+          className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 transition"
+          placeholder="8" />
+      </div>
+      <div>
+        <label className="text-sm text-zinc-400 mb-1 block">
+          Réservations max par soirée
+          <span className="text-zinc-600 font-normal ml-1">(liste d'attente si dépassé)</span>
+        </label>
+        <input type="number" value={f.max_reservations} onChange={e => setF(p => ({ ...p, max_reservations: e.target.value }))}
+          className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 transition"
+          placeholder="1" min="1" />
+      </div>
+      <div className="sm:col-span-2">
+        <label className="text-sm text-zinc-400 mb-1 block">Description</label>
+        <input value={f.description} onChange={e => setF(p => ({ ...p, description: e.target.value }))}
+          className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 transition"
+          placeholder="Face à la scène, service dédié..." />
+      </div>
+      <div className="sm:col-span-2">
+        <label className="flex items-center gap-3 cursor-pointer bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 hover:border-purple-500 transition">
+          <input
+            type="checkbox"
+            checked={f.auto_assign}
+            onChange={e => setF(p => ({ ...p, auto_assign: e.target.checked }))}
+            className="accent-purple-600 w-4 h-4"
+          />
+          <div>
+            <p className="text-white text-sm font-medium">Visible sur toutes les soirées automatiquement</p>
+            <p className="text-zinc-500 text-xs mt-0.5">
+              {f.auto_assign
+                ? 'Ce carré sera ajouté à toutes vos soirées existantes et futures'
+                : 'Ce carré devra être sélectionné manuellement sur chaque soirée'}
+            </p>
+          </div>
+        </label>
+      </div>
+    </div>
+  )
+}
+
 export default function TablesPage() {
   const [tables, setTables] = useState<VipTable[]>([])
   const [venueId, setVenueId] = useState('')
@@ -121,62 +182,6 @@ export default function TablesPage() {
   }
 
   const formatPrice = (cents: number) => `${(cents / 100).toFixed(0)}€`
-
-  const FormFields = ({ f, setF }: { f: typeof emptyForm; setF: (fn: (prev: typeof emptyForm) => typeof emptyForm) => void }) => (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <div>
-        <label className="text-sm text-zinc-400 mb-1 block">Nom du carré *</label>
-        <input value={f.name} onChange={e => setF(p => ({ ...p, name: e.target.value }))}
-          className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 transition"
-          placeholder="Carré Gold, Carré VIP 1..." />
-      </div>
-      <div>
-        <label className="text-sm text-zinc-400 mb-1 block">Minimum spending (€) *</label>
-        <input type="number" value={f.min_spending} onChange={e => setF(p => ({ ...p, min_spending: e.target.value }))}
-          className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 transition"
-          placeholder="400" />
-      </div>
-      <div>
-        <label className="text-sm text-zinc-400 mb-1 block">Capacité (personnes)</label>
-        <input type="number" value={f.capacity} onChange={e => setF(p => ({ ...p, capacity: e.target.value }))}
-          className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 transition"
-          placeholder="8" />
-      </div>
-      <div>
-        <label className="text-sm text-zinc-400 mb-1 block">
-          Réservations max par soirée
-          <span className="text-zinc-600 font-normal ml-1">(liste d'attente si dépassé)</span>
-        </label>
-        <input type="number" value={f.max_reservations} onChange={e => setF(p => ({ ...p, max_reservations: e.target.value }))}
-          className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 transition"
-          placeholder="1" min="1" />
-      </div>
-      <div className="sm:col-span-2">
-        <label className="text-sm text-zinc-400 mb-1 block">Description</label>
-        <input value={f.description} onChange={e => setF(p => ({ ...p, description: e.target.value }))}
-          className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 transition"
-          placeholder="Face à la scène, service dédié..." />
-      </div>
-      <div className="sm:col-span-2">
-        <label className="flex items-center gap-3 cursor-pointer bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 hover:border-purple-500 transition">
-          <input
-            type="checkbox"
-            checked={f.auto_assign}
-            onChange={e => setF(p => ({ ...p, auto_assign: e.target.checked }))}
-            className="accent-purple-600 w-4 h-4"
-          />
-          <div>
-            <p className="text-white text-sm font-medium">Visible sur toutes les soirées automatiquement</p>
-            <p className="text-zinc-500 text-xs mt-0.5">
-              {f.auto_assign
-                ? 'Ce carré sera ajouté à toutes vos soirées existantes et futures'
-                : 'Ce carré devra être sélectionné manuellement sur chaque soirée'}
-            </p>
-          </div>
-        </label>
-      </div>
-    </div>
-  )
 
   return (
     <div>
