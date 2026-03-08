@@ -23,18 +23,16 @@ type Reservation = {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  pending: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
+  pending:   'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
   confirmed: 'bg-green-500/10 text-green-400 border-green-500/20',
-  present: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-  noshow: 'bg-red-500/10 text-red-400 border-red-500/20',
+  attended:  'bg-blue-500/10 text-blue-400 border-blue-500/20',
   cancelled: 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20',
 }
 
 const STATUS_LABELS: Record<string, string> = {
-  pending: 'En attente',
+  pending:   'En attente',
   confirmed: 'Confirmé',
-  present: 'Présent',
-  noshow: 'No-show',
+  attended:  'Venu',
   cancelled: 'Annulé',
 }
 
@@ -42,7 +40,6 @@ export default function ReservationsPage() {
   const [reservations, setReservations] = useState<Reservation[]>([])
   const [deleted, setDeleted] = useState<Reservation[]>([])
   const [filtered, setFiltered] = useState<Reservation[]>([])
-  const [venueId, setVenueId] = useState('')
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
@@ -67,9 +64,7 @@ export default function ReservationsPage() {
     if (!user) return
     const { data: venue } = await supabase.from('venues').select('id').eq('user_id', user.id).single()
     if (!venue) return
-    setVenueId(venue.id)
 
-    // Réservations actives
     const { data: active } = await supabase
       .from('reservations')
       .select('*, event_tables(*, vip_tables(name), events(name, date))')
@@ -77,7 +72,6 @@ export default function ReservationsPage() {
       .is('deleted_at', null)
       .order('created_at', { ascending: false })
 
-    // Corbeille (supprimées il y a moins de 7 jours)
     const sevenDaysAgo = new Date()
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
     const { data: trash } = await supabase
@@ -113,10 +107,8 @@ export default function ReservationsPage() {
   }
 
   const getDaysLeft = (deletedAt: string) => {
-    const deleteDate = new Date(deletedAt)
-    const expiry = new Date(deleteDate.getTime() + 7 * 24 * 60 * 60 * 1000)
-    const diff = Math.ceil((expiry.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
-    return diff
+    const expiry = new Date(new Date(deletedAt).getTime() + 7 * 24 * 60 * 60 * 1000)
+    return Math.ceil((expiry.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
   }
 
   const formatDate = (d: string) => new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
@@ -133,8 +125,7 @@ export default function ReservationsPage() {
       <div className="flex gap-2 mb-6">
         <button
           onClick={() => { setActiveTab('active'); setSelected(null) }}
-          className={`px-4 py-2 rounded-xl text-sm font-medium transition ${activeTab === 'active' ? 'bg-purple-600 text-white' : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800'}`}
-        >
+          className={`px-4 py-2 rounded-xl text-sm font-medium transition ${activeTab === 'active' ? 'bg-purple-600 text-white' : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800'}`}>
           Réservations
           {reservations.length > 0 && (
             <span className="ml-2 bg-white/10 text-white text-xs px-1.5 py-0.5 rounded-full">{reservations.length}</span>
@@ -142,8 +133,7 @@ export default function ReservationsPage() {
         </button>
         <button
           onClick={() => { setActiveTab('trash'); setSelected(null) }}
-          className={`px-4 py-2 rounded-xl text-sm font-medium transition ${activeTab === 'trash' ? 'bg-red-600 text-white' : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800'}`}
-        >
+          className={`px-4 py-2 rounded-xl text-sm font-medium transition ${activeTab === 'trash' ? 'bg-red-600 text-white' : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800'}`}>
           Corbeille
           {deleted.length > 0 && (
             <span className="ml-2 bg-white/10 text-white text-xs px-1.5 py-0.5 rounded-full">{deleted.length}</span>
@@ -169,8 +159,7 @@ export default function ReservationsPage() {
               <select
                 value={statusFilter}
                 onChange={e => setStatusFilter(e.target.value)}
-                className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition text-sm"
-              >
+                className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition text-sm">
                 <option value="all">Tous les statuts</option>
                 {Object.entries(STATUS_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
               </select>
@@ -188,10 +177,8 @@ export default function ReservationsPage() {
               ) : (
                 <div className="space-y-3">
                   {filtered.map(r => (
-                    <div
-                      key={r.id}
-                      className={`w-full bg-zinc-900 border rounded-2xl p-4 transition ${selected?.id === r.id ? 'border-purple-500' : 'border-zinc-800'}`}
-                    >
+                    <div key={r.id}
+                      className={`w-full bg-zinc-900 border rounded-2xl p-4 transition ${selected?.id === r.id ? 'border-purple-500' : 'border-zinc-800'}`}>
                       <div className="flex items-center justify-between gap-3">
                         <button className="flex-1 min-w-0 text-left" onClick={() => setSelected(r)}>
                           <p className="text-white font-medium truncate">{r.client_name}</p>
@@ -204,16 +191,14 @@ export default function ReservationsPage() {
                         </button>
                         <div className="flex items-center gap-3 shrink-0">
                           <div className="text-right">
-                            <span className={`text-xs px-2 py-1 rounded-full border ${STATUS_COLORS[r.status]}`}>
-                              {STATUS_LABELS[r.status]}
+                            <span className={`text-xs px-2 py-1 rounded-full border ${STATUS_COLORS[r.status] || STATUS_COLORS.pending}`}>
+                              {STATUS_LABELS[r.status] || r.status}
                             </span>
                             <p className="text-zinc-400 text-sm mt-1">{formatPrice(r.deposit_amount)}</p>
                           </div>
                           <button
                             onClick={() => handleDelete(r.id)}
-                            className="p-2 rounded-lg text-zinc-600 hover:text-red-400 hover:bg-zinc-800 transition"
-                            title="Supprimer"
-                          >
+                            className="p-2 rounded-lg text-zinc-600 hover:text-red-400 hover:bg-zinc-800 transition">
                             <Trash2 size={15} />
                           </button>
                         </div>
@@ -270,8 +255,7 @@ export default function ReservationsPage() {
                             selected.status === status
                               ? STATUS_COLORS[status] + ' font-semibold'
                               : 'border-zinc-700 text-zinc-400 hover:border-zinc-600 hover:text-white'
-                          }`}
-                        >
+                          }`}>
                           {label}
                         </button>
                       ))}
@@ -280,8 +264,7 @@ export default function ReservationsPage() {
 
                   <button
                     onClick={() => handleDelete(selected.id)}
-                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-red-500/30 text-red-400 hover:bg-red-500/10 transition text-sm"
-                  >
+                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-red-500/30 text-red-400 hover:bg-red-500/10 transition text-sm">
                     <Trash2 size={14} /> Supprimer la réservation
                   </button>
                 </div>
@@ -315,14 +298,12 @@ export default function ReservationsPage() {
                       </p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      <span className={`text-xs px-2 py-1 rounded-full border ${STATUS_COLORS[r.status]}`}>
-                        {STATUS_LABELS[r.status]}
+                      <span className={`text-xs px-2 py-1 rounded-full border ${STATUS_COLORS[r.status] || STATUS_COLORS.pending}`}>
+                        {STATUS_LABELS[r.status] || r.status}
                       </span>
                       <button
                         onClick={() => handleRestore(r.id)}
-                        className="p-2 rounded-lg text-zinc-400 hover:text-green-400 hover:bg-zinc-800 transition"
-                        title="Restaurer"
-                      >
+                        className="p-2 rounded-lg text-zinc-400 hover:text-green-400 hover:bg-zinc-800 transition">
                         <RotateCcw size={15} />
                       </button>
                     </div>
