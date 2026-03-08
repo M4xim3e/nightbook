@@ -1,18 +1,15 @@
 export default function SuspendedPage() {
   return (
-    <div style={{minHeight:'100vh',background:'#0a0a0a',display:'flex',alignItems:'center',justifyContent:'center',padding:'16px'}}>
-      <div style={{textAlign:'center',maxWidth:'400px'}}>
-        <div style={{width:'56px',height:'56px',background:'rgba(220,38,38,0.15)',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 24px'}}>
-          <span style={{fontSize:'24px'}}>🔒</span>
+    <div className="min-h-screen bg-black flex items-center justify-center px-4">
+      <div className="text-center max-w-md">
+        <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+          <span className="text-3xl">🔒</span>
         </div>
-        <h1 style={{fontSize:'22px',fontWeight:'700',color:'#fff',marginBottom:'12px'}}>
+        <h1 className="text-2xl font-bold text-white mb-3">
           Acces suspendu
         </h1>
-        <p style={{color:'#a1a1aa',fontSize:'14px',lineHeight:'1.6'}}>
-          Votre acces a NightBook a ete suspendu. Contactez-nous pour regulariser votre situation.
-        </p>
-        <p style={{marginTop:'20px',color:'#7c3aed',fontSize:'14px',fontWeight:'600'}}>
-          contact@nightbook.fr
+        <p className="text-zinc-400 text-sm leading-relaxed">
+          Votre acces NightBook a ete suspendu definitivement. Contactez-nous a contact@nightbook.fr pour plus d informations.
         </p>
       </div>
     </div>
