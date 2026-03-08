@@ -67,7 +67,7 @@ export default function EventsPage() {
       .from('events')
       .select('*')
       .eq('venue_id', venue.id)
-      .order('date', { ascending: false })
+      .order('date', { ascending: true })
 
     if (!eventsData || eventsData.length === 0) {
       setEvents([])
@@ -240,7 +240,7 @@ export default function EventsPage() {
     acc[event.date].push(event)
     return acc
   }, {})
-  const sortedDates = Object.keys(groupedEvents).sort((a, b) => b.localeCompare(a))
+  const sortedDates = Object.keys(groupedEvents).sort((a, b) => a.localeCompare(b))
 
   const closeAll = () => { setShowForm(false); setDuplicateEventId(null); setEditingEvent(null) }
 

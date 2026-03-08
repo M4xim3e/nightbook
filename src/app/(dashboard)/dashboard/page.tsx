@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { CalendarDays, Users, TrendingUp, Clock } from 'lucide-react'
+import { CalendarDays, Users, TrendingUp, Clock, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 
 export default function DashboardPage() {
@@ -14,6 +14,7 @@ export default function DashboardPage() {
   })
   const [recentReservations, setRecentReservations] = useState<any[]>([])
   const [venueName, setVenueName] = useState('')
+  const [venueSlug, setVenueSlug] = useState('')
   const supabase = createClient()
 
   useEffect(() => {
@@ -23,12 +24,13 @@ export default function DashboardPage() {
 
       const { data: venue } = await supabase
         .from('venues')
-        .select('id, name')
+        .select('id, name, slug')
         .eq('user_id', user.id)
         .single()
 
       if (!venue) return
       setVenueName(venue.name)
+      setVenueSlug(venue.slug || '')
 
       const today = new Date().toISOString().split('T')[0]
 
@@ -86,9 +88,22 @@ export default function DashboardPage() {
 
   return (
     <div>
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-white">Bonjour 👋</h2>
-        <p className="text-zinc-400 mt-1">{venueName} — voici votre tableau de bord</p>
+      <div className="mb-8 flex items-start justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold text-white">Bonjour 👋</h2>
+          <p className="text-zinc-400 mt-1">{venueName} — voici votre tableau de bord</p>
+        </div>
+        {venueSlug && (
+          <a
+            href={`${process.env.NEXT_PUBLIC_APP_URL || ''}/reserve/${venueSlug}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 bg-zinc-900 border border-zinc-700 hover:border-purple-500 text-zinc-300 hover:text-white text-sm font-medium px-4 py-2.5 rounded-xl transition shrink-0"
+          >
+            <ExternalLink size={15} />
+            Lien client
+          </a>
+        )}
       </div>
 
       {/* Stats */}

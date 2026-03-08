@@ -81,11 +81,11 @@ export default function ReservationsPage() {
       .gte('deleted_at', sevenDaysAgo.toISOString())
       .order('deleted_at', { ascending: false })
 
-    // Trier par date de soirée décroissante
+    // Trier par date de soirée croissante (la plus proche en premier)
     const sorted = (active || []).sort((a, b) => {
       const dateA = a.event_tables?.events?.date || ''
       const dateB = b.event_tables?.events?.date || ''
-      return dateB.localeCompare(dateA)
+      return dateA.localeCompare(dateB)
     })
 
     setReservations(sorted)
@@ -136,7 +136,7 @@ export default function ReservationsPage() {
     acc[date].push(r)
     return acc
   }, {})
-  const sortedDates = Object.keys(groupedFiltered).sort((a, b) => b.localeCompare(a))
+  const sortedDates = Object.keys(groupedFiltered).sort((a, b) => a.localeCompare(b))
 
   return (
     <div>
