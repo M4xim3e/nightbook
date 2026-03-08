@@ -18,13 +18,8 @@ export async function POST(request: NextRequest) {
   }
 
   let event: Stripe.Event
-
   try {
-    event = stripe.webhooks.constructEvent(
-      body,
-      signature,
-      process.env.STRIPE_WEBHOOK_SECRET!
-    )
+    event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET!)
   } catch (error) {
     console.error('Webhook error:', error)
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
@@ -35,11 +30,15 @@ export async function POST(request: NextRequest) {
     const reservationId = session.metadata?.reservation_id
 
     if (reservationId) {
+      // Générer l'URL du QR code (API gratuite, pas de lib nécessaire)
+      const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${reservationId}&bgcolor=18181b&color=ffffff&qzone=2`
+
       const { error } = await supabase
         .from('reservations')
         .update({
           status: 'confirmed',
           stripe_payment_status: 'succeeded',
+          qr_code: qrCodeUrl,
         })
         .eq('id', reservationId)
 
@@ -58,7 +57,6 @@ export async function POST(request: NextRequest) {
   if (event.type === 'checkout.session.expired') {
     const session = event.data.object as Stripe.Checkout.Session
     const reservationId = session.metadata?.reservation_id
-
     if (reservationId) {
       await supabase
         .from('reservations')
