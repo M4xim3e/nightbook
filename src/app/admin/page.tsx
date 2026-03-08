@@ -1,0 +1,157 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
+import { useRouter } from 'next/navigation'
+import { CheckCircle, XCircle, Users, Building2 } from 'lucide-react'
+
+type Venue = {
+  id: string
+  name: string
+  slug: string
+  city: string
+  is_active: boolean
+  created_at: string
+  subscription_status: string
+  user_id: string
+}
+
+export default function AdminPage() {
+  const [venues, setVenues] = useState<Venue[]>([])
+  const [loading, setLoading] = useState(true)
+  const [isAdmin, setIsAdmin] = useState(false)
+  const [stats, setStats] = useState({ total: 0, active: 0, suspended: 0 })
+  const supabase = createClient()
+  const router = useRouter()
+
+  useEffect(() => { loadData() }, [])
+
+  const loadData = async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) { router.push('/login'); return }
+
+    // Vérifier admin
+    const { data: adminRecord } = await supabase
+      .from('admins')
+      .select('id')
+      .eq('email', user.email)
+      .single()
+
+    if (!adminRecord) { router.push('/dashboard'); return }
+    setIsAdmin(true)
+
+    // Charger toutes les venues
+    const { data } = await supabase
+      .from('venues')
+      .select('*')
+      .order('created_at', { ascending: false })
+
+    const list = data || []
+    setVenues(list)
+    setStats({
+      total: list.length,
+      active: list.filter(v => v.is_active !== false).length,
+      suspended: list.filter(v => v.is_active === false).length,
+    })
+    setLoading(false)
+  }
+
+  const toggleActive = async (venue: Venue) => {
+    const newState = !venue.is_active
+    const label = newState ? 'réactiver' : 'suspendre'
+    if (!confirm(`Voulez-vous ${label} "${venue.name}" ?`)) return
+
+    await supabase
+      .from('venues')
+      .update({ is_active: newState })
+      .eq('id', venue.id)
+
+    await loadData()
+  }
+
+  const formatDate = (d: string) => new Date(d).toLocaleDateString('fr-FR', {
+    day: 'numeric', month: 'long', year: 'numeric'
+  })
+
+  if (loading) return (
+    <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="text-zinc-400">Chargement...</div>
+    </div>
+  )
+
+  if (!isAdmin) return null
+
+  return (
+    <div className="min-h-screen bg-black px-4 py-12">
+      <div className="max-w-4xl mx-auto">
+
+        {/* Header */}
+        <div className="mb-10">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+              <span className="text-sm">👑</span>
+            </div>
+            <h1 className="text-2xl font-bold text-white">NightBook Admin</h1>
+          </div>
+          <p className="text-zinc-500 text-sm">Gestion des établissements</p>
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-3 gap-4 mb-8">
+          {[
+            { label: 'Total', value: stats.total, icon: Building2, color: 'text-white' },
+            { label: 'Actifs', value: stats.active, icon: CheckCircle, color: 'text-green-400' },
+            { label: 'Suspendus', value: stats.suspended, icon: XCircle, color: 'text-red-400' },
+          ].map(({ label, value, icon: Icon, color }) => (
+            <div key={label} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-zinc-500 text-sm">{label}</span>
+                <Icon size={16} className={color} />
+              </div>
+              <p className={`text-2xl font-bold ${color}`}>{value}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Liste des venues */}
+        <div className="space-y-3">
+          {venues.length === 0 ? (
+            <div className="text-center py-16 bg-zinc-900 border border-zinc-800 rounded-2xl">
+              <Users size={40} className="text-zinc-700 mx-auto mb-3" />
+              <p className="text-zinc-400">Aucun établissement inscrit</p>
+            </div>
+          ) : (
+            venues.map(venue => (
+              <div key={venue.id} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 flex items-center justify-between gap-4">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <p className="text-white font-semibold truncate">{venue.name}</p>
+                    <span className={`text-xs px-2 py-0.5 rounded-full shrink-0 ${venue.is_active !== false ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
+                      {venue.is_active !== false ? 'Actif' : 'Suspendu'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3 text-xs text-zinc-500">
+                    <span>/{venue.slug}</span>
+                    {venue.city && <span>📍 {venue.city}</span>}
+                    <span>Inscrit le {formatDate(venue.created_at)}</span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => toggleActive(venue)}
+                  className={`shrink-0 px-4 py-2 rounded-xl text-sm font-medium transition border ${
+                    venue.is_active !== false
+                      ? 'border-red-500/30 text-red-400 hover:bg-red-500/10'
+                      : 'border-green-500/30 text-green-400 hover:bg-green-500/10'
+                  }`}
+                >
+                  {venue.is_active !== false ? 'Suspendre' : 'Réactiver'}
+                </button>
+              </div>
+            ))
+          )}
+        </div>
+
+      </div>
+    </div>
+  )
+}
