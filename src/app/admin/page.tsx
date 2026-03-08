@@ -3,24 +3,25 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import { CheckCircle, XCircle, Users, Building2 } from 'lucide-react'
 
 type Venue = {
   id: string
   name: string
   slug: string
   city: string
-  is_active: boolean
+  status: string
   created_at: string
-  subscription_status: string
-  user_id: string
+}
+
+const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string; dot: string }> = {
+  active:    { label: 'Actif',     bg: 'rgba(22,163,74,0.1)',   text: '#22c55e', dot: '#22c55e' },
+  paused:    { label: 'En pause',  bg: 'rgba(234,179,8,0.1)',   text: '#eab308', dot: '#eab308' },
+  suspended: { label: 'Suspendu',  bg: 'rgba(220,38,38,0.1)',   text: '#ef4444', dot: '#ef4444' },
 }
 
 export default function AdminPage() {
   const [venues, setVenues] = useState<Venue[]>([])
   const [loading, setLoading] = useState(true)
-  const [isAdmin, setIsAdmin] = useState(false)
-  const [stats, setStats] = useState({ total: 0, active: 0, suspended: 0 })
   const supabase = createClient()
   const router = useRouter()
 
@@ -30,125 +31,109 @@ export default function AdminPage() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { router.push('/login'); return }
 
-    // Vérifier admin
     const { data: adminRecord } = await supabase
-      .from('admins')
-      .select('id')
-      .eq('email', user.email)
-      .single()
-
+      .from('admins').select('id').eq('email', user.email).single()
     if (!adminRecord) { router.push('/dashboard'); return }
-    setIsAdmin(true)
 
-    // Charger toutes les venues
     const { data } = await supabase
-      .from('venues')
-      .select('*')
+      .from('venues').select('id,name,slug,city,status,created_at')
       .order('created_at', { ascending: false })
 
-    const list = data || []
-    setVenues(list)
-    setStats({
-      total: list.length,
-      active: list.filter(v => v.is_active !== false).length,
-      suspended: list.filter(v => v.is_active === false).length,
-    })
+    setVenues(data || [])
     setLoading(false)
   }
 
-  const toggleActive = async (venue: Venue) => {
-    const newState = !venue.is_active
-    const label = newState ? 'réactiver' : 'suspendre'
-    if (!confirm(`Voulez-vous ${label} "${venue.name}" ?`)) return
-
-    await supabase
-      .from('venues')
-      .update({ is_active: newState })
-      .eq('id', venue.id)
-
+  const setStatus = async (venue: Venue, newStatus: string) => {
+    const labels: Record<string, string> = { active: 'activer', paused: 'mettre en pause', suspended: 'suspendre' }
+    if (!confirm(`Voulez-vous ${labels[newStatus]} "${venue.name}" ?`)) return
+    await supabase.from('venues').update({ status: newStatus, is_active: newStatus === 'active' }).eq('id', venue.id)
     await loadData()
   }
 
-  const formatDate = (d: string) => new Date(d).toLocaleDateString('fr-FR', {
-    day: 'numeric', month: 'long', year: 'numeric'
-  })
+  const stats = {
+    total: venues.length,
+    active: venues.filter(v => v.status === 'active').length,
+    paused: venues.filter(v => v.status === 'paused').length,
+    suspended: venues.filter(v => v.status === 'suspended').length,
+  }
+
+  const formatDate = (d: string) => new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
 
   if (loading) return (
-    <div className="min-h-screen bg-black flex items-center justify-center">
-      <div className="text-zinc-400">Chargement...</div>
+    <div style={{minHeight:'100vh',background:'#0a0a0a',display:'flex',alignItems:'center',justifyContent:'center'}}>
+      <p style={{color:'#71717a'}}>Chargement...</p>
     </div>
   )
 
-  if (!isAdmin) return null
-
   return (
-    <div className="min-h-screen bg-black px-4 py-12">
-      <div className="max-w-4xl mx-auto">
+    <div style={{minHeight:'100vh',background:'#0a0a0a',padding:'40px 16px'}}>
+      <div style={{maxWidth:'860px',margin:'0 auto'}}>
 
-        {/* Header */}
-        <div className="mb-10">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
-              <span className="text-sm">👑</span>
-            </div>
-            <h1 className="text-2xl font-bold text-white">NightBook Admin</h1>
+        <div style={{marginBottom:'32px'}}>
+          <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'4px'}}>
+            <div style={{width:'32px',height:'32px',background:'#7c3aed',borderRadius:'8px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'14px'}}>👑</div>
+            <h1 style={{color:'#fff',fontSize:'22px',fontWeight:'700',margin:0}}>NightBook Admin</h1>
           </div>
-          <p className="text-zinc-500 text-sm">Gestion des établissements</p>
+          <p style={{color:'#71717a',fontSize:'13px',margin:0}}>Gestion des etablissements</p>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-3 gap-4 mb-8">
+        <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'12px',marginBottom:'28px'}}>
           {[
-            { label: 'Total', value: stats.total, icon: Building2, color: 'text-white' },
-            { label: 'Actifs', value: stats.active, icon: CheckCircle, color: 'text-green-400' },
-            { label: 'Suspendus', value: stats.suspended, icon: XCircle, color: 'text-red-400' },
-          ].map(({ label, value, icon: Icon, color }) => (
-            <div key={label} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-zinc-500 text-sm">{label}</span>
-                <Icon size={16} className={color} />
-              </div>
-              <p className={`text-2xl font-bold ${color}`}>{value}</p>
+            { label: 'Total', value: stats.total, color: '#fff' },
+            { label: 'Actifs', value: stats.active, color: '#22c55e' },
+            { label: 'En pause', value: stats.paused, color: '#eab308' },
+            { label: 'Suspendus', value: stats.suspended, color: '#ef4444' },
+          ].map(({ label, value, color }) => (
+            <div key={label} style={{background:'#18181b',border:'1px solid #27272a',borderRadius:'12px',padding:'16px'}}>
+              <p style={{color:'#71717a',fontSize:'12px',margin:'0 0 4px'}}>{label}</p>
+              <p style={{color,fontSize:'24px',fontWeight:'700',margin:0}}>{value}</p>
             </div>
           ))}
         </div>
 
-        {/* Liste des venues */}
-        <div className="space-y-3">
+        <div style={{display:'flex',flexDirection:'column',gap:'8px'}}>
           {venues.length === 0 ? (
-            <div className="text-center py-16 bg-zinc-900 border border-zinc-800 rounded-2xl">
-              <Users size={40} className="text-zinc-700 mx-auto mb-3" />
-              <p className="text-zinc-400">Aucun établissement inscrit</p>
+            <div style={{background:'#18181b',border:'1px solid #27272a',borderRadius:'12px',padding:'48px',textAlign:'center'}}>
+              <p style={{color:'#71717a'}}>Aucun etablissement inscrit</p>
             </div>
-          ) : (
-            venues.map(venue => (
-              <div key={venue.id} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 flex items-center justify-between gap-4">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <p className="text-white font-semibold truncate">{venue.name}</p>
-                    <span className={`text-xs px-2 py-0.5 rounded-full shrink-0 ${venue.is_active !== false ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
-                      {venue.is_active !== false ? 'Actif' : 'Suspendu'}
+          ) : venues.map(venue => {
+            const cfg = STATUS_CONFIG[venue.status] || STATUS_CONFIG.active
+            return (
+              <div key={venue.id} style={{background:'#18181b',border:'1px solid #27272a',borderRadius:'12px',padding:'16px 20px',display:'flex',alignItems:'center',gap:'16px'}}>
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'4px'}}>
+                    <p style={{color:'#fff',fontWeight:'600',margin:0,fontSize:'14px'}}>{venue.name}</p>
+                    <span style={{background:cfg.bg,color:cfg.text,fontSize:'11px',fontWeight:'600',padding:'2px 8px',borderRadius:'20px'}}>
+                      {cfg.label}
                     </span>
                   </div>
-                  <div className="flex items-center gap-3 text-xs text-zinc-500">
-                    <span>/{venue.slug}</span>
-                    {venue.city && <span>📍 {venue.city}</span>}
-                    <span>Inscrit le {formatDate(venue.created_at)}</span>
-                  </div>
+                  <p style={{color:'#71717a',fontSize:'12px',margin:0}}>
+                    /{venue.slug}{venue.city ? ` · ${venue.city}` : ''} · {formatDate(venue.created_at)}
+                  </p>
                 </div>
-                <button
-                  onClick={() => toggleActive(venue)}
-                  className={`shrink-0 px-4 py-2 rounded-xl text-sm font-medium transition border ${
-                    venue.is_active !== false
-                      ? 'border-red-500/30 text-red-400 hover:bg-red-500/10'
-                      : 'border-green-500/30 text-green-400 hover:bg-green-500/10'
-                  }`}
-                >
-                  {venue.is_active !== false ? 'Suspendre' : 'Réactiver'}
-                </button>
+                <div style={{display:'flex',gap:'6px',flexShrink:0}}>
+                  {venue.status !== 'active' && (
+                    <button onClick={() => setStatus(venue, 'active')}
+                      style={{background:'rgba(22,163,74,0.1)',color:'#22c55e',border:'1px solid rgba(22,163,74,0.3)',borderRadius:'8px',padding:'6px 12px',fontSize:'12px',fontWeight:'600',cursor:'pointer'}}>
+                      Activer
+                    </button>
+                  )}
+                  {venue.status !== 'paused' && (
+                    <button onClick={() => setStatus(venue, 'paused')}
+                      style={{background:'rgba(234,179,8,0.1)',color:'#eab308',border:'1px solid rgba(234,179,8,0.3)',borderRadius:'8px',padding:'6px 12px',fontSize:'12px',fontWeight:'600',cursor:'pointer'}}>
+                      Pause
+                    </button>
+                  )}
+                  {venue.status !== 'suspended' && (
+                    <button onClick={() => setStatus(venue, 'suspended')}
+                      style={{background:'rgba(220,38,38,0.1)',color:'#ef4444',border:'1px solid rgba(220,38,38,0.3)',borderRadius:'8px',padding:'6px 12px',fontSize:'12px',fontWeight:'600',cursor:'pointer'}}>
+                      Suspendre
+                    </button>
+                  )}
+                </div>
               </div>
-            ))
-          )}
+            )
+          })}
         </div>
 
       </div>
