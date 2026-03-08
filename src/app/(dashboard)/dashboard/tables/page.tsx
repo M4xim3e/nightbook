@@ -9,6 +9,7 @@ type VipTable = {
   name: string
   capacity: number
   min_spending: number
+  max_reservations: number | null
   description: string
   is_active: boolean
   auto_assign: boolean
@@ -19,7 +20,7 @@ export default function TablesPage() {
   const [venueId, setVenueId] = useState('')
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
-  const [form, setForm] = useState({ name: '', capacity: '', min_spending: '', description: '', auto_assign: true })
+  const [form, setForm] = useState({ name: '', capacity: '', min_spending: '', max_reservations: '', description: '', auto_assign: true })
   const [saving, setSaving] = useState(false)
   const supabase = createClient()
 
@@ -45,11 +46,11 @@ export default function TablesPage() {
       name: form.name,
       capacity: form.capacity ? parseInt(form.capacity) : null,
       min_spending: Math.round(parseFloat(form.min_spending) * 100),
+      max_reservations: form.max_reservations ? parseInt(form.max_reservations) : null,
       description: form.description,
       auto_assign: form.auto_assign,
     }).select().single()
 
-    // Si auto_assign → l'ajouter à toutes les soirées existantes
     if (newTable && form.auto_assign) {
       const { data: allEvents } = await supabase.from('events').select('id').eq('venue_id', venueId)
       if (allEvents && allEvents.length > 0) {
@@ -59,7 +60,7 @@ export default function TablesPage() {
       }
     }
 
-    setForm({ name: '', capacity: '', min_spending: '', description: '', auto_assign: true })
+    setForm({ name: '', capacity: '', min_spending: '', max_reservations: '', description: '', auto_assign: true })
     setShowForm(false)
     await loadData()
     setSaving(false)
@@ -110,6 +111,15 @@ export default function TablesPage() {
                 placeholder="8" />
             </div>
             <div>
+              <label className="text-sm text-zinc-400 mb-1 block">
+                Réservations max par soirée
+                <span className="text-zinc-600 font-normal ml-1">(liste d'attente si dépassé)</span>
+              </label>
+              <input type="number" value={form.max_reservations} onChange={e => setForm(f => ({ ...f, max_reservations: e.target.value }))}
+                className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 transition"
+                placeholder="1" min="1" />
+            </div>
+            <div className="sm:col-span-2">
               <label className="text-sm text-zinc-400 mb-1 block">Description</label>
               <input value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
                 className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 transition"
@@ -171,6 +181,9 @@ export default function TablesPage() {
               <p className="text-purple-400 text-xl font-bold mb-1">{formatPrice(table.min_spending)}</p>
               <p className="text-zinc-500 text-xs mb-3">minimum spending</p>
               {table.capacity && <p className="text-zinc-400 text-sm">👥 {table.capacity} personnes max</p>}
+              {table.max_reservations && (
+                <p className="text-zinc-400 text-sm mt-1">🔒 {table.max_reservations} réservation{table.max_reservations > 1 ? 's' : ''} max par soirée</p>
+              )}
               {table.description && <p className="text-zinc-500 text-sm mt-1">{table.description}</p>}
             </div>
           ))}

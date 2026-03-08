@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Search, Filter, Trash2, RotateCcw } from 'lucide-react'
+import { Search, Filter, Trash2, RotateCcw, Calendar } from 'lucide-react'
 
 type Reservation = {
   id: string
@@ -70,7 +70,6 @@ export default function ReservationsPage() {
       .select('*, event_tables(*, vip_tables(name), events(name, date))')
       .eq('venue_id', venue.id)
       .is('deleted_at', null)
-      .order('created_at', { ascending: false })
 
     const sevenDaysAgo = new Date()
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
@@ -82,9 +81,16 @@ export default function ReservationsPage() {
       .gte('deleted_at', sevenDaysAgo.toISOString())
       .order('deleted_at', { ascending: false })
 
-    setReservations(active || [])
+    // Trier par date de soirée décroissante
+    const sorted = (active || []).sort((a, b) => {
+      const dateA = a.event_tables?.events?.date || ''
+      const dateB = b.event_tables?.events?.date || ''
+      return dateB.localeCompare(dateA)
+    })
+
+    setReservations(sorted)
     setDeleted(trash || [])
-    setFiltered(active || [])
+    setFiltered(sorted)
     setLoading(false)
   }
 
@@ -111,8 +117,26 @@ export default function ReservationsPage() {
     return Math.ceil((expiry.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
   }
 
-  const formatDate = (d: string) => new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+  const formatDate = (d: string) => {
+    const [y, m, day] = d.split('-').map(Number)
+    return new Date(y, m - 1, day).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+  }
+
+  const formatDateHeader = (d: string) => {
+    const [y, m, day] = d.split('-').map(Number)
+    return new Date(y, m - 1, day).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+  }
+
   const formatPrice = (cents: number) => cents ? `${(cents / 100).toFixed(0)}€` : '—'
+
+  // Grouper les réservations filtrées par date de soirée
+  const groupedFiltered = filtered.reduce<Record<string, Reservation[]>>((acc, r) => {
+    const date = r.event_tables?.events?.date || 'unknown'
+    if (!acc[date]) acc[date] = []
+    acc[date].push(r)
+    return acc
+  }, {})
+  const sortedDates = Object.keys(groupedFiltered).sort((a, b) => b.localeCompare(a))
 
   return (
     <div>
@@ -175,33 +199,46 @@ export default function ReservationsPage() {
                   <p className="text-zinc-400">Aucune réservation trouvée</p>
                 </div>
               ) : (
-                <div className="space-y-3">
-                  {filtered.map(r => (
-                    <div key={r.id}
-                      className={`w-full bg-zinc-900 border rounded-2xl p-4 transition ${selected?.id === r.id ? 'border-purple-500' : 'border-zinc-800'}`}>
-                      <div className="flex items-center justify-between gap-3">
-                        <button className="flex-1 min-w-0 text-left" onClick={() => setSelected(r)}>
-                          <p className="text-white font-medium truncate">{r.client_name}</p>
-                          <p className="text-zinc-500 text-sm truncate">
-                            {r.event_tables?.vip_tables?.name} — {r.event_tables?.events?.name}
-                          </p>
-                          <p className="text-zinc-600 text-xs mt-0.5">
-                            {r.event_tables?.events?.date && formatDate(r.event_tables.events.date)}
-                          </p>
-                        </button>
-                        <div className="flex items-center gap-3 shrink-0">
-                          <div className="text-right">
-                            <span className={`text-xs px-2 py-1 rounded-full border ${STATUS_COLORS[r.status] || STATUS_COLORS.pending}`}>
-                              {STATUS_LABELS[r.status] || r.status}
-                            </span>
-                            <p className="text-zinc-400 text-sm mt-1">{formatPrice(r.deposit_amount)}</p>
+                <div className="space-y-8">
+                  {sortedDates.map(date => (
+                    <div key={date}>
+                      {/* En-tête de date */}
+                      <div className="flex items-center gap-3 mb-3">
+                        <Calendar size={14} className="text-zinc-500 shrink-0" />
+                        <p className="text-zinc-400 text-sm font-semibold uppercase tracking-wide capitalize">
+                          {date === 'unknown' ? 'Date inconnue' : formatDateHeader(date)}
+                        </p>
+                        <div className="flex-1 h-px bg-zinc-800" />
+                        <span className="text-zinc-600 text-xs shrink-0">{groupedFiltered[date].length} rés.</span>
+                      </div>
+
+                      <div className="space-y-3">
+                        {groupedFiltered[date].map(r => (
+                          <div key={r.id}
+                            className={`w-full bg-zinc-900 border rounded-2xl p-4 transition ${selected?.id === r.id ? 'border-purple-500' : 'border-zinc-800'}`}>
+                            <div className="flex items-center justify-between gap-3">
+                              <button className="flex-1 min-w-0 text-left" onClick={() => setSelected(r)}>
+                                <p className="text-white font-medium truncate">{r.client_name}</p>
+                                <p className="text-zinc-500 text-sm truncate">
+                                  {r.event_tables?.vip_tables?.name} — {r.event_tables?.events?.name}
+                                </p>
+                              </button>
+                              <div className="flex items-center gap-3 shrink-0">
+                                <div className="text-right">
+                                  <span className={`text-xs px-2 py-1 rounded-full border ${STATUS_COLORS[r.status] || STATUS_COLORS.pending}`}>
+                                    {STATUS_LABELS[r.status] || r.status}
+                                  </span>
+                                  <p className="text-zinc-400 text-sm mt-1">{formatPrice(r.deposit_amount)}</p>
+                                </div>
+                                <button
+                                  onClick={() => handleDelete(r.id)}
+                                  className="p-2 rounded-lg text-zinc-600 hover:text-red-400 hover:bg-zinc-800 transition">
+                                  <Trash2 size={15} />
+                                </button>
+                              </div>
+                            </div>
                           </div>
-                          <button
-                            onClick={() => handleDelete(r.id)}
-                            className="p-2 rounded-lg text-zinc-600 hover:text-red-400 hover:bg-zinc-800 transition">
-                            <Trash2 size={15} />
-                          </button>
-                        </div>
+                        ))}
                       </div>
                     </div>
                   ))}
