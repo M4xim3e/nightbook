@@ -18,7 +18,7 @@ export default function RegisterPage() {
     setLoading(true)
     setError('')
 
-    if (!venueName || !email || !password) {
+    if (!email || !password) {
       setError('Tous les champs sont obligatoires')
       setLoading(false)
       return
@@ -39,6 +39,26 @@ export default function RegisterPage() {
     }
 
     if (data.user) {
+      // Vérifier si c'est un admin
+      const { data: adminRecord } = await supabase
+        .from('admins')
+        .select('id')
+        .eq('email', email)
+        .single()
+
+      if (adminRecord) {
+        // Admin → pas de venue, direct /admin
+        router.push('/admin')
+        return
+      }
+
+      // Boîte de nuit → création de la venue obligatoire
+      if (!venueName) {
+        setError('Le nom de l\'établissement est obligatoire')
+        setLoading(false)
+        return
+      }
+
       const slug = venueName
         .toLowerCase()
         .normalize('NFD')
@@ -79,17 +99,6 @@ export default function RegisterPage() {
 
           <div className="space-y-4">
             <div>
-              <label className="text-sm text-zinc-400 mb-1 block">Nom de l'établissement</label>
-              <input
-                type="text"
-                value={venueName}
-                onChange={(e) => setVenueName(e.target.value)}
-                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-3 text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500 transition"
-                placeholder="Le Club, Duplex..."
-              />
-            </div>
-
-            <div>
               <label className="text-sm text-zinc-400 mb-1 block">Email</label>
               <input
                 type="email"
@@ -106,10 +115,22 @@ export default function RegisterPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleRegister()}
                 className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-3 text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500 transition"
                 placeholder="Min. 6 caractères"
               />
+            </div>
+
+            <div>
+              <label className="text-sm text-zinc-400 mb-1 block">Nom de l'établissement</label>
+              <input
+                type="text"
+                value={venueName}
+                onChange={(e) => setVenueName(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleRegister()}
+                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-3 text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500 transition"
+                placeholder="Le Club, Duplex, L'Espace..."
+              />
+              <p className="text-zinc-600 text-xs mt-1">Laissez vide si vous êtes administrateur NightBook</p>
             </div>
 
             <button
