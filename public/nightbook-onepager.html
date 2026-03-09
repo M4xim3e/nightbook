@@ -134,7 +134,7 @@
       box-shadow: 0 3px 12px rgba(147,51,234,0.3);
     }
     .step-mini h4 { font-size: 11px; font-weight: 700; color: #fff; margin-bottom: 5px; }
-    .step-mini p { font-size: 10px; color: #3f3f46; line-height: 1.5; }
+    .step-mini p { font-size: 10px; color: #a1a1aa; line-height: 1.5; }
 
     /* Differentiators */
     .diffs {
@@ -160,21 +160,22 @@
       margin-top: auto; position: relative; z-index: 1;
       background: linear-gradient(135deg, rgba(147,51,234,0.1), rgba(168,85,247,0.05));
       border: 1px solid rgba(147,51,234,0.2);
-      border-radius: 16px; padding: 22px 28px;
-      display: flex; align-items: center; justify-content: space-between;
+      border-radius: 16px; padding: 20px 24px;
     }
-    .cta-text h4 { font-size: 16px; font-weight: 800; margin-bottom: 4px; letter-spacing: -0.3px; }
-    .cta-text p { font-size: 12px; color: #71717a; }
-    .cta-contacts { display: flex; flex-direction: column; gap: 5px; text-align: right; }
-    .cta-contact-item { font-size: 12px; color: #71717a; font-weight: 500; }
-    .cta-contact-item span { color: #e4e4e7; }
-    .cta-badge {
-      background: linear-gradient(135deg, #9333ea, #7c3aed);
-      padding: 10px 22px; border-radius: 10px;
-      font-size: 12px; font-weight: 700; color: white;
-      box-shadow: 0 4px 16px rgba(147,51,234,0.3);
-      white-space: nowrap;
+    .footer-cta-top {
+      margin-bottom: 14px;
     }
+    .footer-cta-top h4 { font-size: 15px; font-weight: 800; margin-bottom: 3px; letter-spacing: -0.3px; }
+    .footer-cta-top p { font-size: 11px; color: #71717a; }
+    .cta-contacts { display: flex; gap: 10px; }
+    .cta-contact-item {
+      flex: 1; display: flex; align-items: center; gap: 10px;
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 10px; padding: 10px 14px;
+    }
+    .cta-contact-icon { font-size: 16px; flex-shrink: 0; }
+    .cta-contact-label { font-size: 9px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: #71717a; margin-bottom: 2px; }
+    .cta-contact-value { font-size: 12px; font-weight: 600; color: #e4e4e7; }
   </style>
 </head>
 <body>
@@ -280,17 +281,25 @@
 
   <!-- CTA Footer -->
   <div class="footer-cta">
-    <div class="cta-text">
-      <h4>14 jours gratuits. Aucun engagement.</h4>
-      <p>Testez NightBook sur votre prochaine soirée — sans carte bancaire requise.</p>
+    <div class="footer-cta-top">
+      <h4>Contactez-nous pour démarrer</h4>
+      <p>Répondez à ce mail ou appelez directement — nous configurons votre espace ensemble.</p>
     </div>
     <div class="cta-contacts">
-      <div class="cta-contact-item">📞 <span>07 69 20 82 74</span></div>
-      <div class="cta-contact-item">✉️ <span>nightbook.contact@gmail.com</span></div>
-    </div>
-    <div style="text-align:right;">
-      <p style="font-size:11px;color:#a1a1aa;font-weight:600;margin:0 0 3px;">Contactez-nous pour démarrer</p>
-      <p style="font-size:10px;color:#71717a;margin:0;">Répondez à ce mail ou appelez directement</p>
+      <div class="cta-contact-item">
+        <span class="cta-contact-icon">📞</span>
+        <div>
+          <div class="cta-contact-label">Téléphone</div>
+          <div class="cta-contact-value">07 69 20 82 74</div>
+        </div>
+      </div>
+      <div class="cta-contact-item">
+        <span class="cta-contact-icon">✉️</span>
+        <div>
+          <div class="cta-contact-label">Email</div>
+          <div class="cta-contact-value">nightbook.contact@gmail.com</div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

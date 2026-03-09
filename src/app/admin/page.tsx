@@ -93,10 +93,6 @@ export default function AdminPage() {
             <p className="text-zinc-500 text-sm ml-11">Gestion des etablissements</p>
           </div>
           <div className="flex items-center gap-3">
-            <a href="/admin/prospects"
-              className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition">
-              📣 Prospection
-            </a>
             <button onClick={handleLogout}
               className="flex items-center gap-2 border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500 px-4 py-2.5 rounded-xl text-sm transition">
               <LogOut size={15} />
