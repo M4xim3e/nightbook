@@ -41,14 +41,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       setVenueName(data.name)
 
       // Vérifier si l'abonnement est valide
-      const hasActiveSubscription =
-        data.subscription_status === 'active' ||
-        data.subscription_status === 'trialing'
-
+      const isActive = data.subscription_status === 'active'
+      const isTrialing = data.subscription_status === 'trialing'
       const trialEndsAt = data.trial_ends_at ? new Date(data.trial_ends_at) : null
-      const trialValid = trialEndsAt && trialEndsAt > new Date()
+      const trialValid = isTrialing && trialEndsAt !== null && trialEndsAt > new Date()
 
-      if (!hasActiveSubscription && !trialValid) {
+      if (!isActive && !trialValid) {
         router.push('/subscribe')
         return
       }
