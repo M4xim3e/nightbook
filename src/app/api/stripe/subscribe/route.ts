@@ -38,9 +38,6 @@ export async function POST() {
       price: process.env.STRIPE_PRICE_ID!,
       quantity: 1,
     }],
-    subscription_data: {
-      trial_period_days: 14,
-    },
     success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?subscribed=true`,
     cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/subscribe?cancelled=true`,
   })

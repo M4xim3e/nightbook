@@ -76,9 +76,17 @@ export default function RegisterPage() {
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/(^-|-$)/g, '')
 
+      const trialEndsAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString()
+
       const { error: venueError } = await supabase
         .from('venues')
-        .insert({ user_id: data.user.id, name: venueName, slug })
+        .insert({
+          user_id: data.user.id,
+          name: venueName,
+          slug,
+          subscription_status: 'trialing',
+          trial_ends_at: trialEndsAt,
+        })
 
       if (venueError) {
         setError('Erreur lors de la création du profil')

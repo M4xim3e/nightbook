@@ -39,12 +39,13 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Abonnement souscrit
-    if (session.mode === 'subscription' && session.customer) {
+    // Abonnement souscrit — on récupère le statut réel depuis Stripe
+    if (session.mode === 'subscription' && session.customer && session.subscription) {
+      const subscription = await stripe.subscriptions.retrieve(session.subscription as string)
       await supabase.from('venues').update({
         status: 'active',
-        subscription_id: session.subscription as string,
-        subscription_status: 'active',
+        subscription_id: subscription.id,
+        subscription_status: subscription.status,
       }).eq('stripe_customer_id', session.customer as string)
     }
   }
