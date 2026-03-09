@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Save, Copy, Check, ExternalLink } from 'lucide-react'
+import { Save, Copy, Check, ExternalLink, Clock } from 'lucide-react'
 
 export default function SettingsPage() {
   const [form, setForm] = useState({
@@ -11,6 +11,7 @@ export default function SettingsPage() {
     cancellation_hours: 24, deposit_type: 'percent', deposit_value: 30, deposit_required: true,
   })
   const [venueId, setVenueId] = useState('')
+  const [trialDaysLeft, setTrialDaysLeft] = useState<number | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -25,6 +26,14 @@ export default function SettingsPage() {
     const { data: venue } = await supabase.from('venues').select('*').eq('user_id', user.id).single()
     if (!venue) return
     setVenueId(venue.id)
+
+    // Calcul jours restants d'essai
+    if (venue.subscription_status === 'trialing' && venue.trial_ends_at) {
+      const diff = new Date(venue.trial_ends_at).getTime() - Date.now()
+      const days = Math.ceil(diff / (1000 * 60 * 60 * 24))
+      setTrialDaysLeft(days > 0 ? days : 0)
+    }
+
     setForm({
       name: venue.name || '',
       slug: venue.slug || '',
@@ -65,6 +74,39 @@ export default function SettingsPage() {
         <h2 className="text-2xl font-bold text-white">Paramètres</h2>
         <p className="text-zinc-400 mt-1">Configurez votre profil et vos règles de réservation</p>
       </div>
+
+      {/* Bannière essai gratuit */}
+      {trialDaysLeft !== null && (
+        <div className={`border rounded-2xl p-4 mb-6 flex items-center gap-4 ${
+          trialDaysLeft <= 3
+            ? 'bg-red-500/10 border-red-500/30'
+            : 'bg-amber-500/10 border-amber-500/30'
+        }`}>
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+            trialDaysLeft <= 3 ? 'bg-red-500/20' : 'bg-amber-500/20'
+          }`}>
+            <Clock size={20} className={trialDaysLeft <= 3 ? 'text-red-400' : 'text-amber-400'} />
+          </div>
+          <div className="flex-1">
+            <p className={`font-semibold text-sm ${trialDaysLeft <= 3 ? 'text-red-300' : 'text-amber-300'}`}>
+              {trialDaysLeft === 0
+                ? 'Votre essai gratuit se termine aujourd\'hui'
+                : `Essai gratuit — ${trialDaysLeft} jour${trialDaysLeft > 1 ? 's' : ''} restant${trialDaysLeft > 1 ? 's' : ''}`}
+            </p>
+            <p className="text-zinc-500 text-xs mt-0.5">
+              {trialDaysLeft <= 3
+                ? 'Passez à l\'abonnement pour continuer à utiliser NightBook sans interruption.'
+                : 'Profitez de toutes les fonctionnalités sans engagement pendant votre période d\'essai.'}
+            </p>
+          </div>
+          {trialDaysLeft <= 7 && (
+            <a href="/subscribe"
+              className="shrink-0 bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold px-4 py-2 rounded-xl transition">
+              S'abonner
+            </a>
+          )}
+        </div>
+      )}
 
       {/* Lien client */}
       <div className="bg-purple-600/10 border border-purple-600/20 rounded-2xl p-5 mb-8">
