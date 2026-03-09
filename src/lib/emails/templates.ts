@@ -60,6 +60,7 @@ export function confirmationEmail({
         Bonjour ${clientName}, votre place est bien réservée.
       </p>
       <div style="border-top:1px solid #27272a;padding-top:20px;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
         ${[
           ['📅 Soirée', eventName],
           ['📆 Date', `${eventDate} à ${eventTime}`],
@@ -67,15 +68,16 @@ export function confirmationEmail({
           ['📍 Lieu', venueAddress ? `${venueAddress}${venueCity ? ', ' + venueCity : ''}` : venueName],
           ['👥 Personnes', `${guestCount} personne${guestCount > 1 ? 's' : ''}`],
         ].map(([label, value]) => `
-          <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #27272a20;">
-            <span style="color:#71717a;font-size:13px;">${label}</span>
-            <span style="color:#ffffff;font-size:13px;font-weight:500;">${value}</span>
-          </div>
+          <tr>
+            <td style="color:#71717a;font-size:13px;padding:10px 8px 10px 0;border-bottom:1px solid #3f3f46;white-space:nowrap;vertical-align:top;">${label} :</td>
+            <td style="color:#ffffff;font-size:13px;font-weight:500;padding:10px 0 10px 8px;border-bottom:1px solid #3f3f46;vertical-align:top;">${value}</td>
+          </tr>
         `).join('')}
-        <div style="display:flex;justify-content:space-between;padding:14px 0 0;margin-top:4px;">
-          <span style="color:#a1a1aa;font-size:14px;font-weight:600;">💳 Acompte payé</span>
-          <span style="color:#a855f7;font-size:16px;font-weight:700;">${(depositAmount / 100).toFixed(0)}€</span>
-        </div>
+        ${depositAmount > 0 ? `<tr>
+          <td style="color:#a1a1aa;font-size:14px;font-weight:600;padding:14px 8px 0 0;white-space:nowrap;vertical-align:top;">💳 Acompte payé :</td>
+          <td style="color:#a855f7;font-size:16px;font-weight:700;padding:14px 0 0 8px;vertical-align:top;">${(depositAmount / 100).toFixed(0)}€</td>
+        </tr>` : ''}
+        </table>
       </div>
     </div>
 
@@ -174,6 +176,7 @@ export function reminderEmail({
         Bonjour ${clientName}, votre soirée VIP est ce soir. On vous attend !
       </p>
       <div style="border-top:1px solid #27272a;padding-top:20px;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
         ${[
           ['📅 Soirée', eventName],
           ['🕐 Heure', eventTime],
@@ -181,11 +184,12 @@ export function reminderEmail({
           ['📍 Lieu', venueAddress ? `${venueAddress}${venueCity ? ', ' + venueCity : ''}` : venueName],
           ['👥 Personnes', `${guestCount} personne${guestCount > 1 ? 's' : ''}`],
         ].map(([label, value]) => `
-          <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #27272a20;">
-            <span style="color:#71717a;font-size:13px;">${label}</span>
-            <span style="color:#ffffff;font-size:13px;font-weight:500;">${value}</span>
-          </div>
+          <tr>
+            <td style="color:#71717a;font-size:13px;padding:10px 8px 10px 0;border-bottom:1px solid #3f3f46;white-space:nowrap;vertical-align:top;">${label} :</td>
+            <td style="color:#ffffff;font-size:13px;font-weight:500;padding:10px 0 10px 8px;border-bottom:1px solid #3f3f46;vertical-align:top;">${value}</td>
+          </tr>
         `).join('')}
+        </table>
       </div>
     </div>
 
@@ -254,17 +258,19 @@ export function waitlistNotificationEmail({
         Bonjour ${clientName}, le carré que vous attendiez est disponible.
       </p>
       <div style="border-top:1px solid #27272a;padding-top:20px;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
         ${[
           ['📅 Soirée', eventName],
           ['📆 Date', eventDate],
           ['🛋️ Carré', tableName],
           ['📍 Lieu', venueName],
         ].map(([label, value]) => `
-          <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #27272a20;">
-            <span style="color:#71717a;font-size:13px;">${label}</span>
-            <span style="color:#ffffff;font-size:13px;font-weight:500;">${value}</span>
-          </div>
+          <tr>
+            <td style="color:#71717a;font-size:13px;padding:10px 8px 10px 0;border-bottom:1px solid #3f3f46;white-space:nowrap;vertical-align:top;">${label} :</td>
+            <td style="color:#ffffff;font-size:13px;font-weight:500;padding:10px 0 10px 8px;border-bottom:1px solid #3f3f46;vertical-align:top;">${value}</td>
+          </tr>
         `).join('')}
+        </table>
       </div>
     </div>
 

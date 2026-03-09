@@ -56,17 +56,12 @@
       position: relative;
       box-shadow: 0 0 16px rgba(147,51,234,0.35);
     }
-    .logo-icon::after {
-      content: '✦'; position: absolute;
-      top: -3px; right: -3px;
-      font-size: 7px; color: #e879f9;
-    }
     .logo-text { line-height: 1; }
     .logo-night { font-size: 12px; font-weight: 800; color: #fff; letter-spacing: 2px; text-transform: uppercase; }
     .logo-book { font-size: 12px; font-weight: 800; color: #9333ea; letter-spacing: 2px; text-transform: uppercase; }
     .header-tag {
       font-size: 10px; font-weight: 600; letter-spacing: 1.5px;
-      text-transform: uppercase; color: #52525b;
+      text-transform: uppercase; color: #71717a;
       border: 1px solid #1c1c1c; padding: 5px 12px; border-radius: 100px;
     }
 
@@ -103,7 +98,7 @@
     .pain-list { display: flex; flex-direction: column; gap: 8px; }
     .pain-item {
       display: flex; gap: 10px; align-items: flex-start;
-      font-size: 12px; color: #52525b; line-height: 1.5;
+      font-size: 13px; color: #71717a; line-height: 1.5;
     }
     .pain-item .icon { flex-shrink: 0; font-size: 13px; }
 
@@ -119,7 +114,7 @@
       justify-content: center; font-size: 14px; flex-shrink: 0;
     }
     .feat-title { font-size: 11px; font-weight: 700; color: #e4e4e7; margin-bottom: 2px; }
-    .feat-desc { font-size: 10px; color: #3f3f46; line-height: 1.4; }
+    .feat-desc { font-size: 11px; color: #71717a; line-height: 1.45; }
 
     /* How it works */
     .steps-row {
@@ -157,7 +152,7 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 10px; color: #22c55e; flex-shrink: 0; margin-top: 1px;
     }
-    .diff p { font-size: 11px; color: #71717a; line-height: 1.5; }
+    .diff p { font-size: 12px; color: #a1a1aa; line-height: 1.5; }
     .diff p strong { color: #a1a1aa; }
 
     /* Footer CTA */
@@ -169,7 +164,7 @@
       display: flex; align-items: center; justify-content: space-between;
     }
     .cta-text h4 { font-size: 16px; font-weight: 800; margin-bottom: 4px; letter-spacing: -0.3px; }
-    .cta-text p { font-size: 12px; color: #52525b; }
+    .cta-text p { font-size: 12px; color: #71717a; }
     .cta-contacts { display: flex; flex-direction: column; gap: 5px; text-align: right; }
     .cta-contact-item { font-size: 12px; color: #71717a; font-weight: 500; }
     .cta-contact-item span { color: #e4e4e7; }
@@ -230,7 +225,7 @@
         </div>
         <div class="feat">
           <div class="feat-icon">✉️</div>
-          <div><div class="feat-title">Emails automatiques</div><div class="feat-desc">Confirmation, rappel J-1, annulation &amp; remboursement</div></div>
+          <div><div class="feat-title">Emails automatiques</div><div class="feat-desc">Confirmation, rappel J-1, remboursement automatique si annulation</div></div>
         </div>
         <div class="feat">
           <div class="feat-icon">📊</div>
@@ -267,19 +262,19 @@
   <div class="diffs">
     <div class="diff">
       <div class="diff-check">✓</div>
-      <p><strong>Zéro no-show</strong> — l'acompte sécurise chaque réservation. Pas de présence = vous gardez l'acompte.</p>
+      <p><strong>Remboursement automatique</strong> — si un carré est annulé, le client est remboursé sans aucune intervention de votre équipe.</p>
     </div>
     <div class="diff">
       <div class="diff-check">✓</div>
-      <p><strong>100% spécialisé clubs</strong> — pensé pour la réalité des boîtes de nuit, pas un outil généraliste.</p>
+      <p><strong>Acompte optionnel</strong> — l'acompte peut être désactivé si vous préférez confirmer les réservations sans paiement préalable.</p>
     </div>
     <div class="diff">
       <div class="diff-check">✓</div>
-      <p><strong>Opérationnel en 30 minutes</strong> — pas de développeur, pas d'agence, pas d'intégration.</p>
+      <p><strong>Opérationnel en 30 minutes</strong> — aucune intégration, aucun développeur. Vous partagez votre lien le jour même.</p>
     </div>
     <div class="diff">
       <div class="diff-check">✓</div>
-      <p><strong>Sans engagement</strong> — résiliable à tout moment, en un clic depuis votre espace.</p>
+      <p><strong>Sans engagement</strong> — résiliation en un clic depuis votre espace. Aucun frais caché, aucune pénalité.</p>
     </div>
   </div>
 
@@ -287,13 +282,16 @@
   <div class="footer-cta">
     <div class="cta-text">
       <h4>14 jours gratuits. Aucun engagement.</h4>
-      <p>Testez NightBook sur votre prochaine soirée — sans carte bancaire.</p>
+      <p>Testez NightBook sur votre prochaine soirée — sans carte bancaire requise.</p>
     </div>
     <div class="cta-contacts">
       <div class="cta-contact-item">📞 <span>07 69 20 82 74</span></div>
       <div class="cta-contact-item">✉️ <span>nightbook.contact@gmail.com</span></div>
     </div>
-    <div class="cta-badge">Démarrer l'essai gratuit</div>
+    <div style="text-align:right;">
+      <p style="font-size:11px;color:#a1a1aa;font-weight:600;margin:0 0 3px;">Contactez-nous pour démarrer</p>
+      <p style="font-size:10px;color:#71717a;margin:0;">Répondez à ce mail ou appelez directement</p>
+    </div>
   </div>
 </div>
 </body>

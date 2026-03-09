@@ -82,7 +82,7 @@ export default function CGVPage() {
           <section>
             <h2 className="text-white font-semibold text-lg mb-3">Article 9 — Contact</h2>
             <p>
-              Pour toute question relative aux présentes CGV : <span className="text-purple-400">maximeeck14@gmail.com</span>
+              Pour toute question relative aux présentes CGV : <span className="text-purple-400">nightbook.contact@gmail.com</span>
             </p>
           </section>
 

@@ -434,9 +434,9 @@ export default function ReservePage() {
                         </div>
                         <button
                           onClick={() => { setWaitlistTable(et); setWaitlistName(''); setWaitlistEmail(''); setWaitlistPhone(''); setWaitlistGuests(2); setWaitlistError(''); setWaitlistSuccess(false) }}
-                          className="mt-3 w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-purple-500/30 text-purple-400 hover:bg-purple-500/10 transition text-sm"
+                          className="mt-3 w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-purple-600/20 border border-purple-500/60 text-purple-300 hover:bg-purple-600/30 hover:border-purple-400 transition text-sm font-semibold"
                         >
-                          <Bell size={14} /> Me prévenir si une place se libère
+                          <Bell size={15} /> Prévenir si une place se libère
                         </button>
                       </div>
                     ))}

@@ -14,7 +14,7 @@ export default function MentionsLegalesPage() {
               <p><span className="text-zinc-500">Statut :</span> Auto-entrepreneur (immatriculation en cours)</p>
               <p><span className="text-zinc-500">SIRET :</span> En cours d'immatriculation</p>
               <p><span className="text-zinc-500">Adresse :</span> 244 rue de Nantes</p>
-              <p><span className="text-zinc-500">Email :</span> maximeeck14@gmail.com</p>
+              <p><span className="text-zinc-500">Email :</span> nightbook.contact@gmail.com</p>
             </div>
           </section>
 
@@ -44,7 +44,7 @@ export default function MentionsLegalesPage() {
           <section>
             <h2 className="text-white font-semibold text-lg mb-3">Contact</h2>
             <p className="text-sm">
-              Pour toute question, contactez-nous à : <span className="text-purple-400">maximeeck14@gmail.com</span>
+              Pour toute question, contactez-nous à : <span className="text-purple-400">nightbook.contact@gmail.com</span>
             </p>
           </section>
 
