@@ -94,6 +94,8 @@ export default function RegisterPage() {
         return
       }
 
+      // Forcer la session SSR après signUp
+      await supabase.auth.signInWithPassword({ email, password })
       router.push('/dashboard')
     }
   }

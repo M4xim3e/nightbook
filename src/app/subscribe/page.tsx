@@ -1,19 +1,25 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 
 export default function SubscribePage() {
   const [loading, setLoading] = useState(false)
-  const router = useRouter()
+  const [error, setError] = useState('')
 
   const handleSubscribe = async () => {
     setLoading(true)
-    const res = await fetch('/api/stripe/subscribe', { method: 'POST' })
-    const data = await res.json()
-    if (data.url) {
-      window.location.href = data.url
-    } else {
+    setError('')
+    try {
+      const res = await fetch('/api/stripe/subscribe', { method: 'POST' })
+      const data = await res.json()
+      if (data.url) {
+        window.location.href = data.url
+      } else {
+        setError(data.error || 'Une erreur est survenue. Réessayez ou contactez-nous.')
+        setLoading(false)
+      }
+    } catch {
+      setError('Erreur réseau. Réessayez.')
       setLoading(false)
     }
   }
@@ -49,6 +55,12 @@ export default function SubscribePage() {
               </div>
             ))}
           </div>
+
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg p-3 mb-4 text-sm">
+              {error}
+            </div>
+          )}
 
           <button
             onClick={handleSubscribe}
