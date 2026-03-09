@@ -28,9 +28,6 @@ export default function SubscribePage() {
 
         <div className="bg-zinc-900 rounded-2xl p-8 border border-zinc-800">
           <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 text-purple-400 rounded-full px-4 py-1.5 text-sm font-medium mb-4">
-              14 jours gratuits
-            </div>
             <p className="text-5xl font-bold text-white mb-1">79€</p>
             <p className="text-zinc-500 text-sm">par mois · sans engagement</p>
           </div>
@@ -58,11 +55,11 @@ export default function SubscribePage() {
             disabled={loading}
             className="w-full bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white font-semibold py-3 rounded-xl transition"
           >
-            {loading ? 'Redirection...' : 'Commencer l\'essai gratuit'}
+            {loading ? 'Redirection...' : 'S\'abonner'}
           </button>
 
           <p className="text-center text-zinc-600 text-xs mt-4">
-            Aucun prelevement pendant 14 jours · Resiliable a tout moment
+            Prelevement automatique chaque mois · Resiliable a tout moment
           </p>
         </div>
 

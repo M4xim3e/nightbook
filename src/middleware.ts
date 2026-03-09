@@ -51,15 +51,23 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL('/dashboard', request.url))
     }
 
-    // Boîte avec statut paused ou suspended
+    // Boîte avec statut paused, suspended ou trial expiré
     if (!isAdmin && pathname.startsWith('/dashboard')) {
       const { data: venue } = await supabase
-        .from('venues').select('status').eq('user_id', user.id).single()
+        .from('venues').select('status, subscription_status, trial_ends_at').eq('user_id', user.id).single()
       if (venue?.status === 'suspended') {
         return NextResponse.redirect(new URL('/suspended', request.url))
       }
       if (venue?.status === 'paused') {
         return NextResponse.redirect(new URL('/paused', request.url))
+      }
+      // Trial expiré → page d'abonnement
+      const isActive = venue?.subscription_status === 'active'
+      const isTrialing = venue?.subscription_status === 'trialing'
+      const trialEndsAt = venue?.trial_ends_at ? new Date(venue.trial_ends_at) : null
+      const trialValid = isTrialing && trialEndsAt !== null && trialEndsAt > new Date()
+      if (!isActive && !trialValid) {
+        return NextResponse.redirect(new URL('/subscribe', request.url))
       }
     }
   }
