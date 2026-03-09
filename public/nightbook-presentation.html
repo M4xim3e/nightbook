@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NightBook — Présentation commerciale</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+      background: #080808;
+      color: #ffffff;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    @media print {
+      body { background: #080808; }
+      .page { page-break-after: always; margin: 0; width: 100%; }
+      .page:last-child { page-break-after: avoid; }
+      @page { size: A4; margin: 0; }
+    }
+
+    /* ======================== LOGO SVG ======================== */
+    .logo-mark {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo-icon {
+      width: 42px;
+      height: 42px;
+      background: linear-gradient(135deg, #9333ea, #7c3aed);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: 900;
+      color: white;
+      letter-spacing: -1px;
+      position: relative;
+      box-shadow: 0 0 20px rgba(147,51,234,0.4);
+    }
+    .logo-icon::after {
+      content: '✦';
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      font-size: 9px;
+      color: #e879f9;
+    }
+    .logo-text-wrap { line-height: 1; }
+    .logo-text-night {
+      font-size: 15px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    .logo-text-book {
+      font-size: 15px;
+      font-weight: 800;
+      color: #9333ea;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* ======================== PAGE 1 — COVER ======================== */
+    .cover {
+      background: #080808;
+      min-height: 297mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 50px 56px;
+      position: relative;
+    }
+    .cover-bg-gradient {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 80% 20%, rgba(147,51,234,0.18) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 20% 80%, rgba(124,58,237,0.10) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .cover-noise {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    }
+    .cover-header {
+      position: relative;
+      z-index: 1;
+    }
+    .cover-body {
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px 0 40px;
+    }
+    .cover-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(147,51,234,0.12);
+      border: 1px solid rgba(147,51,234,0.3);
+      color: #c084fc;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 100px;
+      margin-bottom: 32px;
+    }
+    .cover-tag::before { content: '✦'; font-size: 8px; }
+    .cover-headline {
+      font-size: 56px;
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -2px;
+      margin-bottom: 28px;
+    }
+    .cover-headline .purple { color: #a855f7; }
+    .cover-subline {
+      font-size: 18px;
+      color: #71717a;
+      line-height: 1.6;
+      max-width: 480px;
+      font-weight: 400;
+    }
+    .cover-divider {
+      width: 60px;
+      height: 3px;
+      background: linear-gradient(90deg, #9333ea, transparent);
+      border-radius: 2px;
+      margin: 36px 0;
+    }
+    .cover-pills {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .cover-pill {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #a1a1aa;
+      font-size: 12px;
+      padding: 7px 16px;
+      border-radius: 100px;
+      font-weight: 500;
+    }
+    .cover-footer {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .cover-footer-contact {
+      display: flex;
+      gap: 24px;
+    }
+    .cover-footer-item {
+      font-size: 11px;
+      color: #52525b;
+      font-weight: 500;
+    }
+    .cover-footer-item span { color: #71717a; }
+    .cover-year {
+      font-size: 11px;
+      color: #3f3f46;
+    }
+
+    /* ======================== PAGE 2 — PROBLÈME ======================== */
+    .section {
+      min-height: 297mm;
+      padding: 56px 56px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+    }
+    .section-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #9333ea;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-label::before {
+      content: '';
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: #9333ea;
+      border-radius: 1px;
+    }
+    .section-title {
+      font-size: 40px;
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -1.5px;
+      margin-bottom: 16px;
+    }
+    .section-subtitle {
+      font-size: 15px;
+      color: #71717a;
+      line-height: 1.7;
+      max-width: 520px;
+      margin-bottom: 52px;
+    }
+
+    /* Pain points */
+    .pain-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+    .pain-card {
+      background: #111111;
+      border: 1px solid #1e1e1e;
+      border-radius: 16px;
+      padding: 28px;
+      position: relative;
+      overflow: hidden;
+    }
+    .pain-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #ef4444, transparent);
+    }
+    .pain-card.orange::before { background: linear-gradient(90deg, #f97316, transparent); }
+    .pain-card.yellow::before { background: linear-gradient(90deg, #eab308, transparent); }
+    .pain-card.blue::before { background: linear-gradient(90deg, #6366f1, transparent); }
+    .pain-emoji {
+      font-size: 28px;
+      margin-bottom: 14px;
+      display: block;
+    }
+    .pain-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 8px;
+    }
+    .pain-desc {
+      font-size: 13px;
+      color: #52525b;
+      line-height: 1.6;
+    }
+    .pain-quote {
+      background: #0d0d0d;
+      border: 1px solid #1a1a1a;
+      border-left: 3px solid #9333ea;
+      border-radius: 12px;
+      padding: 24px 28px;
+    }
+    .pain-quote p {
+      font-size: 15px;
+      color: #a1a1aa;
+      line-height: 1.7;
+      font-style: italic;
+    }
+    .pain-quote strong { color: #e4e4e7; font-style: normal; }
+
+    /* ======================== PAGE 3 — SOLUTION ======================== */
+    .solution-intro {
+      background: linear-gradient(135deg, rgba(147,51,234,0.08), rgba(124,58,237,0.04));
+      border: 1px solid rgba(147,51,234,0.15);
+      border-radius: 20px;
+      padding: 32px;
+      margin-bottom: 36px;
+      text-align: center;
+    }
+    .solution-intro p {
+      font-size: 17px;
+      color: #d4d4d8;
+      line-height: 1.7;
+      font-weight: 400;
+    }
+    .solution-intro strong { color: #ffffff; }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .feature-card {
+      background: #0f0f0f;
+      border: 1px solid #1c1c1c;
+      border-radius: 14px;
+      padding: 22px 24px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .feature-icon {
+      width: 40px;
+      height: 40px;
+      background: rgba(147,51,234,0.12);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .feature-content {}
+    .feature-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 5px;
+    }
+    .feature-desc {
+      font-size: 12px;
+      color: #52525b;
+      line-height: 1.5;
+    }
+
+    /* ======================== PAGE 4 — COMMENT ÇA MARCHE ======================== */
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin-bottom: 48px;
+    }
+    .step {
+      display: flex;
+      gap: 28px;
+      padding: 32px 0;
+      border-bottom: 1px solid #141414;
+      position: relative;
+    }
+    .step:last-child { border-bottom: none; }
+    .step-number {
+      width: 52px;
+      height: 52px;
+      background: linear-gradient(135deg, #9333ea, #7c3aed);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: 900;
+      color: white;
+      flex-shrink: 0;
+      box-shadow: 0 4px 20px rgba(147,51,234,0.3);
+    }
+    .step-body {}
+    .step-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+    .step-desc {
+      font-size: 14px;
+      color: #71717a;
+      line-height: 1.6;
+      max-width: 480px;
+    }
+    .step-desc strong { color: #a1a1aa; }
+
+    .result-box {
+      background: linear-gradient(135deg, rgba(147,51,234,0.1), rgba(168,85,247,0.05));
+      border: 1px solid rgba(147,51,234,0.2);
+      border-radius: 16px;
+      padding: 28px 32px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .result-box-icon {
+      font-size: 36px;
+      flex-shrink: 0;
+    }
+    .result-box p {
+      font-size: 16px;
+      color: #d4d4d8;
+      line-height: 1.6;
+    }
+    .result-box strong { color: #ffffff; }
+
+    /* ======================== PAGE 5 — POURQUOI ======================== */
+    .why-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+    .why-card {
+      background: #0f0f0f;
+      border: 1px solid #1c1c1c;
+      border-radius: 16px;
+      padding: 28px 22px;
+      text-align: center;
+    }
+    .why-card-icon {
+      font-size: 32px;
+      margin-bottom: 14px;
+      display: block;
+    }
+    .why-card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 8px;
+    }
+    .why-card-desc {
+      font-size: 12px;
+      color: #52525b;
+      line-height: 1.6;
+    }
+
+    .differentiators {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .diff-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 18px 22px;
+      background: #0a0a0a;
+      border: 1px solid #161616;
+      border-radius: 12px;
+    }
+    .diff-check {
+      width: 22px;
+      height: 22px;
+      background: rgba(34,197,94,0.12);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 12px;
+      color: #22c55e;
+      margin-top: 1px;
+    }
+    .diff-text {
+      font-size: 13px;
+      color: #a1a1aa;
+      line-height: 1.5;
+    }
+    .diff-text strong { color: #ffffff; }
+
+    /* ======================== PAGE 6 — CONTACT ======================== */
+    .contact-page {
+      min-height: 297mm;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      background: #080808;
+      position: relative;
+      overflow: hidden;
+    }
+    .contact-bg {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background:
+        radial-gradient(ellipse 70% 60% at 50% 40%, rgba(147,51,234,0.14) 0%, transparent 70%);
+    }
+    .contact-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 56px;
+      position: relative;
+      z-index: 1;
+      text-align: center;
+    }
+    .contact-pretitle {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #9333ea;
+      margin-bottom: 20px;
+    }
+    .contact-headline {
+      font-size: 48px;
+      font-weight: 900;
+      letter-spacing: -2px;
+      line-height: 1.1;
+      margin-bottom: 20px;
+    }
+    .contact-sub {
+      font-size: 16px;
+      color: #52525b;
+      margin-bottom: 52px;
+      line-height: 1.6;
+    }
+    .contact-cards {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 52px;
+    }
+    .contact-card {
+      background: #111111;
+      border: 1px solid #1e1e1e;
+      border-radius: 16px;
+      padding: 22px 32px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 200px;
+    }
+    .contact-card-icon {
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .contact-card-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #52525b;
+      margin-bottom: 3px;
+    }
+    .contact-card-value {
+      font-size: 13px;
+      font-weight: 600;
+      color: #e4e4e7;
+    }
+    .contact-trial {
+      background: linear-gradient(135deg, #9333ea, #7c3aed);
+      border-radius: 16px;
+      padding: 22px 44px;
+      font-size: 16px;
+      font-weight: 700;
+      color: white;
+      letter-spacing: 0.2px;
+      box-shadow: 0 8px 32px rgba(147,51,234,0.35);
+    }
+    .contact-trial span {
+      display: block;
+      font-size: 11px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.6);
+      margin-top: 3px;
+      letter-spacing: 0;
+    }
+    .contact-footer {
+      position: relative;
+      z-index: 1;
+      padding: 24px 56px;
+      border-top: 1px solid rgba(255,255,255,0.04);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .contact-footer-legal {
+      font-size: 10px;
+      color: #2a2a2a;
+    }
+
+    /* ======================== SECTION HEADER (repeating) ======================== */
+    .section-header-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 40px;
+    }
+    .page-indicator {
+      font-size: 10px;
+      font-weight: 600;
+      color: #2a2a2a;
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- =============================== PAGE 1 — COVER =============================== -->
+<div class="page cover">
+  <div class="cover-bg-gradient"></div>
+  <div class="cover-noise"></div>
+
+  <div class="cover-header">
+    <div class="logo-mark">
+      <div class="logo-icon">N</div>
+      <div class="logo-text-wrap">
+        <div class="logo-text-night">Night</div>
+        <div class="logo-text-book">Book</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cover-body">
+    <div class="cover-tag">Logiciel de réservation VIP</div>
+    <div class="cover-headline">
+      Vos carrés VIP,<br>
+      <span class="purple">vendus en ligne.</span><br>
+      Vos acomptes,<br>encaissés automatiquement.
+    </div>
+    <div class="cover-divider"></div>
+    <p class="cover-subline">
+      NightBook automatise intégralement la gestion des réservations VIP de votre club — de la prise de réservation jusqu'à l'encaissement de l'acompte.
+    </p>
+    <div class="cover-divider" style="margin-top:36px;"></div>
+    <div class="cover-pills">
+      <div class="cover-pill">Page de réservation publique</div>
+      <div class="cover-pill">Paiement d'acompte intégré</div>
+      <div class="cover-pill">Zéro no-show</div>
+      <div class="cover-pill">Emails automatiques</div>
+      <div class="cover-pill">Dashboard temps réel</div>
+    </div>
+  </div>
+
+  <div class="cover-footer">
+    <div class="cover-footer-contact">
+      <div class="cover-footer-item">📞 <span>07 69 20 82 74</span></div>
+      <div class="cover-footer-item">✉️ <span>nightbook.contact@gmail.com</span></div>
+    </div>
+    <div class="cover-year">2026</div>
+  </div>
+</div>
+
+<!-- =============================== PAGE 2 — LE PROBLÈME =============================== -->
+<div class="page section" style="background:#080808;">
+  <div class="section-header-bar">
+    <div class="logo-mark" style="transform:scale(0.75);transform-origin:left;">
+      <div class="logo-icon">N</div>
+      <div class="logo-text-wrap">
+        <div class="logo-text-night">Night</div>
+        <div class="logo-text-book">Book</div>
+      </div>
+    </div>
+    <div class="page-indicator">02 / 05</div>
+  </div>
+
+  <div class="section-label">Le constat</div>
+  <h2 class="section-title">La gestion des réservations<br>VIP est <span style="color:#ef4444;">cassée.</span></h2>
+  <p class="section-subtitle">Aujourd'hui, la plupart des clubs gèrent encore leurs carrés VIP à la main. Le résultat : du temps perdu, de l'argent perdu, et une image qui ne colle pas avec le niveau de l'établissement.</p>
+
+  <div class="pain-grid">
+    <div class="pain-card">
+      <span class="pain-emoji">📲</span>
+      <div class="pain-title">WhatsApp & SMS à n'en plus finir</div>
+      <p class="pain-desc">Chaque réservation passe par des échanges manuels. L'équipe passe des heures à confirmer, relancer, coordonner — pour chaque soirée.</p>
+    </div>
+    <div class="pain-card orange">
+      <span class="pain-emoji">🚫</span>
+      <div class="pain-title">Les no-shows, un fléau silencieux</div>
+      <p class="pain-desc">Sans acompte, rien ne retient le client. Un carré réservé qui ne se remplit pas, c'est du minimum spending perdu — à chaque soirée.</p>
+    </div>
+    <div class="pain-card yellow">
+      <span class="pain-emoji">📋</span>
+      <div class="pain-title">Excel, notes, tableurs bricolés</div>
+      <p class="pain-desc">Pas de vue globale, des erreurs de double réservation, impossible de savoir en temps réel ce qui est disponible.</p>
+    </div>
+    <div class="pain-card blue">
+      <span class="pain-emoji">🪞</span>
+      <div class="pain-title">Une image en décalage</div>
+      <p class="pain-desc">Les meilleurs clubs investissent dans leur ambiance, leur déco, leur line-up. Mais le parcours de réservation reste au niveau d'un groupe WhatsApp.</p>
+    </div>
+  </div>
+
+  <div class="pain-quote">
+    <p>"Nos clients s'attendent à une expérience premium dès le premier contact — la réservation est ce premier contact. Elle doit être à la hauteur." <strong>— NightBook</strong></p>
+  </div>
+</div>
+
+<!-- =============================== PAGE 3 — LA SOLUTION =============================== -->
+<div class="page section" style="background:#080808;">
+  <div class="section-header-bar">
+    <div class="logo-mark" style="transform:scale(0.75);transform-origin:left;">
+      <div class="logo-icon">N</div>
+      <div class="logo-text-wrap">
+        <div class="logo-text-night">Night</div>
+        <div class="logo-text-book">Book</div>
+      </div>
+    </div>
+    <div class="page-indicator">03 / 05</div>
+  </div>
+
+  <div class="section-label">La solution</div>
+  <h2 class="section-title">NightBook prend en charge<br><span style="color:#a855f7;">tout ce que vous faites à la main.</span></h2>
+
+  <div class="solution-intro">
+    <p>NightBook est une <strong>plateforme SaaS clé en main</strong> qui donne à votre club une page de réservation en ligne professionnelle, collecte automatiquement les acomptes, et gère tout le reste — confirmations, rappels, annulations, liste d'attente — <strong>sans intervention de votre équipe.</strong></p>
+  </div>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">🌐</div>
+      <div class="feature-content">
+        <div class="feature-title">Page de réservation publique</div>
+        <p class="feature-desc">Votre page personnalisée, accessible depuis un lien Instagram ou QR code. Vos clients choisissent leur soirée, leur carré, et réservent en 2 minutes.</p>
+      </div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">💳</div>
+      <div class="feature-content">
+        <div class="feature-title">Paiement d'acompte intégré</div>
+        <p class="feature-desc">Chaque réservation est sécurisée par un acompte payé en ligne via Stripe. L'argent va directement sur votre compte bancaire.</p>
+      </div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">✉️</div>
+      <div class="feature-content">
+        <div class="feature-title">Emails automatiques</div>
+        <p class="feature-desc">Confirmation instantanée, rappel la veille de la soirée, gestion des annulations avec remboursement automatique.</p>
+      </div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📊</div>
+      <div class="feature-content">
+        <div class="feature-title">Dashboard en temps réel</div>
+        <p class="feature-desc">Vue complète de vos soirées, carrés, réservations et acomptes encaissés. Marquez les présents le soir J, gérez les no-shows.</p>
+      </div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔔</div>
+      <div class="feature-content">
+        <div class="feature-title">Liste d'attente intelligente</div>
+        <p class="feature-desc">Un carré se libère ? Le premier sur la liste est notifié automatiquement par email. Aucun carré ne reste vide.</p>
+      </div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">⚙️</div>
+      <div class="feature-content">
+        <div class="feature-title">Configuration totale</div>
+        <p class="feature-desc">Définissez vos carrés, leur capacité, leur minimum spending, le montant de l'acompte, les délais d'annulation, le dress code.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =============================== PAGE 4 — COMMENT ÇA MARCHE =============================== -->
+<div class="page section" style="background:#080808;">
+  <div class="section-header-bar">
+    <div class="logo-mark" style="transform:scale(0.75);transform-origin:left;">
+      <div class="logo-icon">N</div>
+      <div class="logo-text-wrap">
+        <div class="logo-text-night">Night</div>
+        <div class="logo-text-book">Book</div>
+      </div>
+    </div>
+    <div class="page-indicator">04 / 05</div>
+  </div>
+
+  <div class="section-label">Mise en place</div>
+  <h2 class="section-title">Opérationnel en<br><span style="color:#a855f7;">moins de 30 minutes.</span></h2>
+  <p class="section-subtitle">Aucune intégration complexe, aucune compétence technique requise. Votre espace est prêt à recevoir des réservations le jour même.</p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-number">1</div>
+      <div class="step-body">
+        <div class="step-title">Créez votre espace NightBook</div>
+        <p class="step-desc">Renseignez les informations de votre établissement, configurez vos <strong>carrés VIP</strong> (nom, capacité, minimum spending, acompte), et créez vos premières soirées.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-number">2</div>
+      <div class="step-body">
+        <div class="step-title">Partagez votre lien de réservation</div>
+        <p class="step-desc">Un lien unique est généré pour votre établissement. Mettez-le en <strong>bio Instagram</strong>, en story, ou en QR code à l'entrée. Vos clients réservent directement depuis leur téléphone.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-number">3</div>
+      <div class="step-body">
+        <div class="step-title">NightBook gère tout le reste</div>
+        <p class="step-desc">Les réservations arrivent dans votre dashboard. Les clients reçoivent leur confirmation et leur rappel automatiquement. Les <strong>acomptes sont virés sur votre compte Stripe.</strong> Vous n'avez plus qu'à accueillir vos clients.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="result-box">
+    <div class="result-box-icon">💡</div>
+    <p>Le soir de la soirée, votre liste de réservations est <strong>propre, complète et à jour</strong> — avec les noms, les carrés, les acomptes encaissés. Fini les "il m'avait dit qu'il réservait".</p>
+  </div>
+</div>
+
+<!-- =============================== PAGE 5 — POURQUOI NIGHTBOOK =============================== -->
+<div class="page section" style="background:#080808;">
+  <div class="section-header-bar">
+    <div class="logo-mark" style="transform:scale(0.75);transform-origin:left;">
+      <div class="logo-icon">N</div>
+      <div class="logo-text-wrap">
+        <div class="logo-text-night">Night</div>
+        <div class="logo-text-book">Book</div>
+      </div>
+    </div>
+    <div class="page-indicator">05 / 05</div>
+  </div>
+
+  <div class="section-label">Pourquoi NightBook</div>
+  <h2 class="section-title">Conçu<span style="color:#a855f7;"> exclusivement</span><br>pour les clubs.</h2>
+  <p class="section-subtitle" style="margin-bottom:36px;">NightBook n'est pas un outil généraliste adapté à la nuit. C'est un outil pensé, de bout en bout, pour la réalité d'un club.</p>
+
+  <div class="why-grid">
+    <div class="why-card">
+      <span class="why-card-icon">🎯</span>
+      <div class="why-card-title">100% spécialisé nuit</div>
+      <p class="why-card-desc">Carrés VIP, minimum spending, soirées à thème, dress code — chaque fonctionnalité est pensée pour votre univers.</p>
+    </div>
+    <div class="why-card">
+      <span class="why-card-icon">⚡</span>
+      <div class="why-card-title">Zéro friction technique</div>
+      <p class="why-card-desc">Pas de développeur, pas d'agence, pas d'intégration. Vous configurez, vous partagez, c'est parti.</p>
+    </div>
+    <div class="why-card">
+      <span class="why-card-icon">🔒</span>
+      <div class="why-card-title">Acomptes sécurisés</div>
+      <p class="why-card-desc">Paiements gérés par Stripe, standard bancaire le plus fiable au monde. L'argent va directement sur votre compte.</p>
+    </div>
+  </div>
+
+  <div class="differentiators">
+    <div class="diff-item">
+      <div class="diff-check">✓</div>
+      <p class="diff-text"><strong>Pas de no-show</strong> — chaque réservation est sécurisée par un acompte. Si le client annule dans les délais, il est remboursé automatiquement. Sinon, vous gardez l'acompte.</p>
+    </div>
+    <div class="diff-item">
+      <div class="diff-check">✓</div>
+      <p class="diff-text"><strong>Vos clients ne "sautent" pas</strong> — la liste d'attente automatique s'assure qu'un carré libéré est immédiatement proposé au suivant.</p>
+    </div>
+    <div class="diff-item">
+      <div class="diff-check">✓</div>
+      <p class="diff-text"><strong>Essai gratuit 14 jours</strong> — configurez votre espace, testez sur une vraie soirée, et décidez ensuite. Sans carte bancaire requise pour commencer.</p>
+    </div>
+    <div class="diff-item">
+      <div class="diff-check">✓</div>
+      <p class="diff-text"><strong>Sans engagement</strong> — vous résiliez quand vous voulez depuis votre espace, en un clic. Aucun frais caché, aucune pénalité.</p>
+    </div>
+  </div>
+</div>
+
+<!-- =============================== PAGE 6 — CONTACT =============================== -->
+<div class="page contact-page">
+  <div class="contact-bg"></div>
+  <div class="contact-body">
+    <div class="logo-mark" style="margin-bottom:48px;">
+      <div class="logo-icon" style="width:52px;height:52px;font-size:26px;">N</div>
+      <div class="logo-text-wrap">
+        <div class="logo-text-night" style="font-size:18px;">Night</div>
+        <div class="logo-text-book" style="font-size:18px;">Book</div>
+      </div>
+    </div>
+
+    <div class="contact-pretitle">Prêt à démarrer ?</div>
+    <div class="contact-headline">14 jours gratuits.<br>Aucun engagement.</div>
+    <p class="contact-sub">Testez NightBook sur votre prochaine soirée.<br>Si ça ne change pas votre façon de travailler, vous ne payez rien.</p>
+
+    <div class="contact-cards">
+      <div class="contact-card">
+        <div class="contact-card-icon">📞</div>
+        <div>
+          <div class="contact-card-label">Téléphone</div>
+          <div class="contact-card-value">07 69 20 82 74</div>
+        </div>
+      </div>
+      <div class="contact-card">
+        <div class="contact-card-icon">✉️</div>
+        <div>
+          <div class="contact-card-label">Email</div>
+          <div class="contact-card-value">nightbook.contact@gmail.com</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="contact-trial">
+      Commencer l'essai gratuit
+      <span>Répondez à ce mail ou appelez directement</span>
+    </div>
+  </div>
+
+  <div class="contact-footer">
+    <div class="logo-mark" style="transform:scale(0.65);transform-origin:left;opacity:0.4;">
+      <div class="logo-icon">N</div>
+      <div class="logo-text-wrap">
+        <div class="logo-text-night">Night</div>
+        <div class="logo-text-book">Book</div>
+      </div>
+    </div>
+    <div class="contact-footer-legal" style="color:#1a1a1a;">nightbook.contact@gmail.com · 07 69 20 82 74 · Nantes, France</div>
+  </div>
+</div>
+
+</body>
+</html>

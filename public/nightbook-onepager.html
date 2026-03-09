@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NightBook — One Pager</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #080808;
+      color: #fff;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    @media print {
+      body { background: #080808; }
+      @page { size: A4; margin: 0; }
+    }
+
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto;
+      padding: 44px 52px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .bg {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background:
+        radial-gradient(ellipse 55% 35% at 85% 15%, rgba(147,51,234,0.16) 0%, transparent 65%),
+        radial-gradient(ellipse 35% 30% at 15% 85%, rgba(124,58,237,0.08) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 36px;
+      position: relative;
+      z-index: 1;
+    }
+    .logo { display: flex; align-items: center; gap: 10px; }
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, #9333ea, #7c3aed);
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 900; color: white;
+      position: relative;
+      box-shadow: 0 0 16px rgba(147,51,234,0.35);
+    }
+    .logo-icon::after {
+      content: '✦'; position: absolute;
+      top: -3px; right: -3px;
+      font-size: 7px; color: #e879f9;
+    }
+    .logo-text { line-height: 1; }
+    .logo-night { font-size: 12px; font-weight: 800; color: #fff; letter-spacing: 2px; text-transform: uppercase; }
+    .logo-book { font-size: 12px; font-weight: 800; color: #9333ea; letter-spacing: 2px; text-transform: uppercase; }
+    .header-tag {
+      font-size: 10px; font-weight: 600; letter-spacing: 1.5px;
+      text-transform: uppercase; color: #52525b;
+      border: 1px solid #1c1c1c; padding: 5px 12px; border-radius: 100px;
+    }
+
+    /* Hero */
+    .hero {
+      margin-bottom: 32px;
+      position: relative; z-index: 1;
+    }
+    .hero h1 {
+      font-size: 36px; font-weight: 900; letter-spacing: -1.5px;
+      line-height: 1.1; margin-bottom: 12px;
+    }
+    .hero h1 em { font-style: normal; color: #a855f7; }
+    .hero p {
+      font-size: 14px; color: #71717a; line-height: 1.65;
+      max-width: 440px;
+    }
+
+    /* Two columns */
+    .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; position: relative; z-index: 1; }
+
+    /* Problem */
+    .box {
+      background: #0f0f0f; border: 1px solid #1c1c1c;
+      border-radius: 14px; padding: 22px;
+    }
+    .box-label {
+      font-size: 9px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: #9333ea; margin-bottom: 12px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .box-label::before { content: ''; display: block; width: 16px; height: 1.5px; background: #9333ea; }
+    .box h3 { font-size: 15px; font-weight: 800; margin-bottom: 12px; letter-spacing: -0.3px; }
+    .pain-list { display: flex; flex-direction: column; gap: 8px; }
+    .pain-item {
+      display: flex; gap: 10px; align-items: flex-start;
+      font-size: 12px; color: #52525b; line-height: 1.5;
+    }
+    .pain-item .icon { flex-shrink: 0; font-size: 13px; }
+
+    /* Features */
+    .feature-list { display: flex; flex-direction: column; gap: 8px; }
+    .feat {
+      display: flex; gap: 10px; align-items: flex-start;
+      background: #141414; border-radius: 9px; padding: 10px 12px;
+    }
+    .feat-icon {
+      width: 28px; height: 28px; background: rgba(147,51,234,0.12);
+      border-radius: 7px; display: flex; align-items: center;
+      justify-content: center; font-size: 14px; flex-shrink: 0;
+    }
+    .feat-title { font-size: 11px; font-weight: 700; color: #e4e4e7; margin-bottom: 2px; }
+    .feat-desc { font-size: 10px; color: #3f3f46; line-height: 1.4; }
+
+    /* How it works */
+    .steps-row {
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px; margin-bottom: 16px; position: relative; z-index: 1;
+    }
+    .step-mini {
+      background: #0f0f0f; border: 1px solid #1c1c1c;
+      border-radius: 12px; padding: 18px 16px; text-align: center;
+    }
+    .step-num {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, #9333ea, #7c3aed);
+      border-radius: 9px; display: flex; align-items: center;
+      justify-content: center; font-size: 15px; font-weight: 900;
+      color: white; margin: 0 auto 10px;
+      box-shadow: 0 3px 12px rgba(147,51,234,0.3);
+    }
+    .step-mini h4 { font-size: 11px; font-weight: 700; color: #fff; margin-bottom: 5px; }
+    .step-mini p { font-size: 10px; color: #3f3f46; line-height: 1.5; }
+
+    /* Differentiators */
+    .diffs {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 8px; margin-bottom: 16px; position: relative; z-index: 1;
+    }
+    .diff {
+      display: flex; gap: 10px; align-items: flex-start;
+      padding: 12px 14px; background: #0a0a0a;
+      border: 1px solid #141414; border-radius: 10px;
+    }
+    .diff-check {
+      width: 18px; height: 18px;
+      background: rgba(34,197,94,0.1); border-radius: 5px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; color: #22c55e; flex-shrink: 0; margin-top: 1px;
+    }
+    .diff p { font-size: 11px; color: #71717a; line-height: 1.5; }
+    .diff p strong { color: #a1a1aa; }
+
+    /* Footer CTA */
+    .footer-cta {
+      margin-top: auto; position: relative; z-index: 1;
+      background: linear-gradient(135deg, rgba(147,51,234,0.1), rgba(168,85,247,0.05));
+      border: 1px solid rgba(147,51,234,0.2);
+      border-radius: 16px; padding: 22px 28px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .cta-text h4 { font-size: 16px; font-weight: 800; margin-bottom: 4px; letter-spacing: -0.3px; }
+    .cta-text p { font-size: 12px; color: #52525b; }
+    .cta-contacts { display: flex; flex-direction: column; gap: 5px; text-align: right; }
+    .cta-contact-item { font-size: 12px; color: #71717a; font-weight: 500; }
+    .cta-contact-item span { color: #e4e4e7; }
+    .cta-badge {
+      background: linear-gradient(135deg, #9333ea, #7c3aed);
+      padding: 10px 22px; border-radius: 10px;
+      font-size: 12px; font-weight: 700; color: white;
+      box-shadow: 0 4px 16px rgba(147,51,234,0.3);
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+  <div class="bg"></div>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo">
+      <div class="logo-icon">N</div>
+      <div class="logo-text">
+        <div class="logo-night">Night</div>
+        <div class="logo-book">Book</div>
+      </div>
+    </div>
+    <div class="header-tag">Logiciel de réservation VIP · Clubs &amp; Boîtes de nuit</div>
+  </div>
+
+  <!-- Hero -->
+  <div class="hero">
+    <h1>Vos carrés VIP, réservés en ligne.<br><em>Vos acomptes, encaissés automatiquement.</em></h1>
+    <p>NightBook est la plateforme qui automatise la gestion des réservations VIP de votre club — de la prise de réservation jusqu'au virement de l'acompte sur votre compte.</p>
+  </div>
+
+  <!-- Problem + Features -->
+  <div class="cols">
+    <div class="box">
+      <div class="box-label">Le problème actuel</div>
+      <h3>La gestion manuelle coûte cher.</h3>
+      <div class="pain-list">
+        <div class="pain-item"><span class="icon">📲</span><span>Des heures perdues par soirée sur WhatsApp et au téléphone pour confirmer des réservations</span></div>
+        <div class="pain-item"><span class="icon">🚫</span><span>Des carrés vides le soir J à cause des no-shows — sans acompte, rien ne retient le client</span></div>
+        <div class="pain-item"><span class="icon">📋</span><span>Des tableurs bricolés, des erreurs de double réservation, aucune vue en temps réel</span></div>
+        <div class="pain-item"><span class="icon">🪞</span><span>Un parcours de réservation en décalage avec le niveau de l'établissement</span></div>
+      </div>
+    </div>
+    <div class="box">
+      <div class="box-label">Ce que fait NightBook</div>
+      <h3>Tout ce que vous faites à la main.</h3>
+      <div class="feature-list">
+        <div class="feat">
+          <div class="feat-icon">🌐</div>
+          <div><div class="feat-title">Page de réservation publique</div><div class="feat-desc">Lien partageable sur Instagram, stories ou QR code</div></div>
+        </div>
+        <div class="feat">
+          <div class="feat-icon">💳</div>
+          <div><div class="feat-title">Acompte intégré via Stripe</div><div class="feat-desc">L'argent va directement sur votre compte bancaire</div></div>
+        </div>
+        <div class="feat">
+          <div class="feat-icon">✉️</div>
+          <div><div class="feat-title">Emails automatiques</div><div class="feat-desc">Confirmation, rappel J-1, annulation &amp; remboursement</div></div>
+        </div>
+        <div class="feat">
+          <div class="feat-icon">📊</div>
+          <div><div class="feat-title">Dashboard temps réel</div><div class="feat-desc">Soirées, carrés, réservations, acomptes encaissés</div></div>
+        </div>
+        <div class="feat">
+          <div class="feat-icon">🔔</div>
+          <div><div class="feat-title">Liste d'attente intelligente</div><div class="feat-desc">Notification automatique si un carré se libère</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Steps -->
+  <div class="steps-row">
+    <div class="step-mini">
+      <div class="step-num">1</div>
+      <h4>Configurez</h4>
+      <p>Renseignez vos carrés VIP, soirées, minimum spending et règles d'acompte</p>
+    </div>
+    <div class="step-mini">
+      <div class="step-num">2</div>
+      <h4>Partagez</h4>
+      <p>Un lien unique pour votre établissement — bio Instagram, stories, QR code</p>
+    </div>
+    <div class="step-mini">
+      <div class="step-num">3</div>
+      <h4>Encaissez</h4>
+      <p>Les réservations arrivent, les acomptes tombent. NightBook gère tout le reste</p>
+    </div>
+  </div>
+
+  <!-- Diffs -->
+  <div class="diffs">
+    <div class="diff">
+      <div class="diff-check">✓</div>
+      <p><strong>Zéro no-show</strong> — l'acompte sécurise chaque réservation. Pas de présence = vous gardez l'acompte.</p>
+    </div>
+    <div class="diff">
+      <div class="diff-check">✓</div>
+      <p><strong>100% spécialisé clubs</strong> — pensé pour la réalité des boîtes de nuit, pas un outil généraliste.</p>
+    </div>
+    <div class="diff">
+      <div class="diff-check">✓</div>
+      <p><strong>Opérationnel en 30 minutes</strong> — pas de développeur, pas d'agence, pas d'intégration.</p>
+    </div>
+    <div class="diff">
+      <div class="diff-check">✓</div>
+      <p><strong>Sans engagement</strong> — résiliable à tout moment, en un clic depuis votre espace.</p>
+    </div>
+  </div>
+
+  <!-- CTA Footer -->
+  <div class="footer-cta">
+    <div class="cta-text">
+      <h4>14 jours gratuits. Aucun engagement.</h4>
+      <p>Testez NightBook sur votre prochaine soirée — sans carte bancaire.</p>
+    </div>
+    <div class="cta-contacts">
+      <div class="cta-contact-item">📞 <span>07 69 20 82 74</span></div>
+      <div class="cta-contact-item">✉️ <span>nightbook.contact@gmail.com</span></div>
+    </div>
+    <div class="cta-badge">Démarrer l'essai gratuit</div>
+  </div>
+</div>
+</body>
+</html>
