@@ -13,6 +13,7 @@ type Venue = {
   arrival_info: string
   deposit_type: string
   deposit_value: number
+  deposit_required: boolean
   cancellation_hours: number
 }
 
@@ -147,6 +148,8 @@ export default function ReservePage() {
     const cancelDeadline = new Date(selectedEvent!.date)
     cancelDeadline.setHours(cancelDeadline.getHours() - (venue?.cancellation_hours || 24))
 
+    const depositRequired = venue?.deposit_required !== false
+
     const { data: reservation, error: resError } = await supabase
       .from('reservations')
       .insert({
@@ -158,8 +161,8 @@ export default function ReservePage() {
         guest_count: guestCount,
         estimated_budget: getDrinksTotal() || null,
         special_request: specialRequest || null,
-        status: 'pending',
-        deposit_amount: getDepositAmount(),
+        status: depositRequired ? 'pending' : 'confirmed',
+        deposit_amount: depositRequired ? getDepositAmount() : 0,
         cancellation_deadline: cancelDeadline.toISOString(),
       })
       .select().single()
@@ -175,6 +178,17 @@ export default function ReservePage() {
         .filter(([, qty]) => qty > 0)
         .map(([drinkId, qty]) => ({ reservation_id: reservation.id, drink_id: drinkId, quantity: qty }))
       await supabase.from('reservation_drinks').insert(drinkInserts)
+    }
+
+    if (!depositRequired) {
+      // Pas d'acompte : confirmation directe + email immédiat
+      await fetch('/api/emails/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reservationId: reservation.id }),
+      })
+      window.location.href = `${window.location.origin}/reserve/${slug}/success?reservation_id=${reservation.id}`
+      return
     }
 
     const response = await fetch('/api/stripe/checkout', {
@@ -508,10 +522,12 @@ export default function ReservePage() {
                 <span className="text-zinc-500">Minimum spending</span>
                 <span className="text-white">{selectedTable && formatPrice(getMinSpending(selectedTable))}</span>
               </div>
-              <div className="flex justify-between text-sm border-t border-zinc-800 pt-2 mt-2">
-                <span className="text-zinc-400 font-medium">Acompte à payer</span>
-                <span className="text-purple-400 font-bold">{formatPrice(getDepositAmount())}</span>
-              </div>
+              {venue?.deposit_required !== false && (
+                <div className="flex justify-between text-sm border-t border-zinc-800 pt-2 mt-2">
+                  <span className="text-zinc-400 font-medium">Acompte à payer</span>
+                  <span className="text-purple-400 font-bold">{formatPrice(getDepositAmount())}</span>
+                </div>
+              )}
             </div>
 
             {error && <div className="bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg p-3 mb-4 text-sm">{error}</div>}
@@ -580,7 +596,7 @@ export default function ReservePage() {
               </button>
               <button onClick={handleSubmit} disabled={submitting}
                 className="flex-1 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white font-semibold py-3 rounded-xl transition">
-                {submitting ? 'Envoi...' : `Réserver — Acompte ${formatPrice(getDepositAmount())}`}
+                {submitting ? 'Envoi...' : venue?.deposit_required !== false ? `Réserver — Acompte ${formatPrice(getDepositAmount())}` : 'Confirmer ma réservation'}
               </button>
             </div>
           </div>

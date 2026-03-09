@@ -8,7 +8,7 @@ export default function SettingsPage() {
   const [form, setForm] = useState({
     name: '', slug: '', description: '', address: '', city: '',
     dress_code: '', arrival_info: '',
-    cancellation_hours: 24, deposit_type: 'percent', deposit_value: 30,
+    cancellation_hours: 24, deposit_type: 'percent', deposit_value: 30, deposit_required: true,
   })
   const [venueId, setVenueId] = useState('')
   const [loading, setLoading] = useState(true)
@@ -36,6 +36,7 @@ export default function SettingsPage() {
       cancellation_hours: venue.cancellation_hours || 24,
       deposit_type: venue.deposit_type || 'percent',
       deposit_value: venue.deposit_value || 30,
+      deposit_required: venue.deposit_required ?? true,
     })
     setLoading(false)
   }
@@ -148,6 +149,24 @@ export default function SettingsPage() {
               className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition"
               min={1} />
             <p className="text-zinc-600 text-xs mt-1">Le client pourra annuler jusqu'à {form.cancellation_hours}h avant la soirée</p>
+          </div>
+          <div>
+            <label className="flex items-center gap-3 cursor-pointer bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 hover:border-purple-500 transition">
+              <input
+                type="checkbox"
+                checked={form.deposit_required}
+                onChange={e => setForm(f => ({ ...f, deposit_required: e.target.checked }))}
+                className="accent-purple-600 w-4 h-4"
+              />
+              <div>
+                <p className="text-white text-sm font-medium">Paiement d'acompte obligatoire</p>
+                <p className="text-zinc-500 text-xs mt-0.5">
+                  {form.deposit_required
+                    ? 'Un acompte est requis pour confirmer la réservation'
+                    : 'La réservation est confirmée immédiatement, sans paiement'}
+                </p>
+              </div>
+            </label>
           </div>
           <div>
             <label className="text-sm text-zinc-400 mb-2 block">Type d'acompte</label>
