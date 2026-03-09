@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>NightBook — Templates Prospection</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f4f4f5;
+      color: #18181b;
+      padding: 40px 20px;
+    }
+    .container { max-width: 860px; margin: 0 auto; }
+    h1 {
+      font-size: 28px;
+      font-weight: 800;
+      color: #09090b;
+      margin-bottom: 8px;
+    }
+    .intro {
+      font-size: 14px;
+      color: #71717a;
+      margin-bottom: 40px;
+      line-height: 1.6;
+    }
+    .email-block {
+      background: white;
+      border-radius: 16px;
+      border: 1px solid #e4e4e7;
+      margin-bottom: 28px;
+      overflow: hidden;
+    }
+    .email-header {
+      background: #09090b;
+      color: white;
+      padding: 20px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .email-header h2 { font-size: 16px; font-weight: 700; }
+    .email-header .badge {
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15);
+      padding: 4px 10px;
+      border-radius: 100px;
+      white-space: nowrap;
+    }
+    .email-meta {
+      padding: 16px 28px;
+      background: #fafafa;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .meta-row {
+      font-size: 13px;
+      color: #52525b;
+      margin-bottom: 4px;
+      display: flex;
+      gap: 8px;
+    }
+    .meta-row:last-child { margin-bottom: 0; }
+    .meta-label { font-weight: 600; color: #3f3f46; min-width: 80px; }
+    .email-body {
+      padding: 28px;
+      font-size: 14px;
+      color: #27272a;
+      line-height: 1.8;
+      white-space: pre-wrap;
+    }
+    .variable {
+      background: #fef9c3;
+      border: 1px solid #fef08a;
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-weight: 600;
+      color: #713f12;
+      font-size: 13px;
+    }
+    .note {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 10px;
+      padding: 14px 20px;
+      font-size: 13px;
+      color: #14532d;
+      margin: 20px 28px 28px;
+      line-height: 1.6;
+    }
+    .note strong { color: #15803d; }
+    .divider {
+      text-align: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: #a1a1aa;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 16px 0;
+    }
+    .purple-header { background: linear-gradient(135deg, #7c3aed, #9333ea); }
+    .orange-header { background: linear-gradient(135deg, #c2410c, #ea580c); }
+    .red-header { background: linear-gradient(135deg, #991b1b, #dc2626); }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <h1>NightBook — Templates de prospection</h1>
+  <p class="intro">
+    4 templates à utiliser dans l'ordre. Les <span style="background:#fef9c3;border:1px solid #fef08a;border-radius:4px;padding:1px 5px;font-weight:600;color:#713f12;font-size:12px;">[VARIABLES]</span> sont à remplacer à chaque envoi.<br>
+    Séquence : J0 (version A ou B) → J+3 (si pas de réponse) → J+7 (si toujours pas de réponse)
+  </p>
+
+  <!-- ========== EMAIL 1A ========== -->
+  <div class="email-block">
+    <div class="email-header purple-header">
+      <h2>✉️ Email J0 — Version A</h2>
+      <span class="badge">Contact direct identifié (direction@, contact@, booking@…)</span>
+    </div>
+    <div class="email-meta">
+      <div class="meta-row"><span class="meta-label">Objet :</span> [NOM DU CLUB] — vos carrés VIP méritent mieux qu'un groupe WhatsApp</div>
+      <div class="meta-row"><span class="meta-label">À :</span> [EMAIL DIRECT] (direction, gérant, responsable réservations)</div>
+    </div>
+    <div class="email-body">Bonjour,
+
+Je me permets de vous contacter car je travaille avec plusieurs clubs sur la gestion de leurs réservations VIP, et le <span class="variable">[NOM DU CLUB]</span> correspond exactement au type d'établissement que NightBook accompagne.
+
+Concrètement : aujourd'hui, la majorité des clubs gèrent encore leurs carrés via WhatsApp, SMS ou Excel. Le résultat, c'est du temps perdu pour votre équipe, des no-shows non anticipés, et un parcours de réservation qui ne reflète pas le niveau de votre établissement.
+
+NightBook change ça. En quelques mots :
+
+→ Votre club obtient une page de réservation en ligne à votre image
+→ Les clients réservent et paient un acompte directement (l'argent va sur votre compte)
+→ Confirmations, rappels et annulations sont gérés automatiquement
+→ Votre équipe reçoit chaque soir une liste propre, complète, à jour
+
+Si une réservation est annulée, le client est remboursé automatiquement — sans action de votre part. Et si vous préférez ne pas exiger d'acompte, c'est paramétrable.
+
+Mise en place en moins de 30 minutes, essai gratuit 14 jours, sans engagement.
+
+Seriez-vous disponible pour un échange rapide cette semaine — 10-15 minutes suffisent pour que je vous montre comment ça fonctionne ?
+
+Cordialement,
+Maxime ECK
+NightBook
+📞 07 69 20 82 74
+✉️ nightbook.contact@gmail.com</div>
+    <div class="note">
+      <strong>Quand utiliser cette version :</strong> vous avez trouvé une adresse directe (direction@, contact@, booking@, reservation@, gerant@…). Personnalisez le nom du club dans l'objet et le corps. Restez sobre — pas de "j'espère que vous allez bien".
+    </div>
+  </div>
+
+  <!-- ========== EMAIL 1B ========== -->
+  <div class="email-block">
+    <div class="email-header purple-header">
+      <h2>✉️ Email J0 — Version B</h2>
+      <span class="badge">Contact incertain (info@, hello@, adresse générique…)</span>
+    </div>
+    <div class="email-meta">
+      <div class="meta-row"><span class="meta-label">Objet :</span> À transmettre à votre responsable réservations / direction — NightBook</div>
+      <div class="meta-row"><span class="meta-label">À :</span> [EMAIL GÉNÉRIQUE]</div>
+    </div>
+    <div class="email-body">Bonjour,
+
+Si vous n'êtes pas la personne en charge des réservations ou de la direction de <span class="variable">[NOM DU CLUB]</span>, pourriez-vous faire suivre ce message à la personne concernée ? Je vous en remercie par avance.
+
+---
+
+Bonjour,
+
+Je me permets de vous contacter au sujet de la gestion de vos carrés VIP.
+
+Je travaille avec plusieurs clubs sur la digitalisation de leurs réservations, et j'aimerais vous présenter NightBook — une solution pensée spécifiquement pour les boîtes de nuit.
+
+En résumé : vos clients réservent et paient un acompte directement en ligne, les confirmations et rappels partent automatiquement, et votre équipe dispose chaque soir d'une liste de réservations propre et à jour — sans WhatsApp, sans Excel, sans no-show.
+
+Si une réservation est annulée dans les délais, le client est remboursé automatiquement. L'acompte peut également être désactivé si vous préférez confirmer sans paiement préalable.
+
+Essai gratuit 14 jours, sans engagement, opérationnel en moins de 30 minutes.
+
+Seriez-vous ouvert à un échange rapide cette semaine ?
+
+Cordialement,
+Maxime ECK
+NightBook
+📞 07 69 20 82 74
+✉️ nightbook.contact@gmail.com</div>
+    <div class="note">
+      <strong>Quand utiliser cette version :</strong> l'adresse mail est générique (info@, hello@, contact général) et vous n'êtes pas sûr que ça atterrit au bon endroit. Le paragraphe d'intro demande explicitement de transférer. Le ton est volontairement neutre.
+    </div>
+  </div>
+
+  <!-- ========== EMAIL J+3 ========== -->
+  <div class="email-block">
+    <div class="email-header orange-header">
+      <h2>✉️ Email J+3 — Relance</h2>
+      <span class="badge">3 jours après J0, si pas de réponse</span>
+    </div>
+    <div class="email-meta">
+      <div class="meta-row"><span class="meta-label">Objet :</span> Suite — NightBook &amp; <span class="variable">[NOM DU CLUB]</span></div>
+      <div class="meta-row"><span class="meta-label">À :</span> [MÊME EMAIL QU'EN J0]</div>
+    </div>
+    <div class="email-body">Bonjour,
+
+Je me permets de revenir vers vous suite à mon message de <span class="variable">[JOUR D'ENVOI J0]</span>.
+
+Je sais que les périodes de préparation de soirée laissent peu de temps pour les emails — c'est justement pour ça que NightBook existe.
+
+Une donnée qui parle d'elle-même : un carré VIP non rempli représente en moyenne entre 500€ et 2 000€ de minimum spending non réalisé, selon votre configuration. Avec un acompte en ligne, ce risque disparaît — soit le client vient, soit vous conservez l'acompte.
+
+Si cela peut être utile, je suis disponible pour un appel de 10 minutes cette semaine ou la suivante, au moment qui vous convient.
+
+Cordialement,
+Maxime ECK
+NightBook
+📞 07 69 20 82 74
+✉️ nightbook.contact@gmail.com</div>
+    <div class="note">
+      <strong>Conseil :</strong> Répondez directement au fil du premier email (ne créez pas un nouveau thread). L'objet "Suite —" sera visible dans la conversation existante, ce qui augmente le taux d'ouverture. Vous pouvez adapter le chiffre si vous avez des infos sur le minimum spending du club.
+    </div>
+  </div>
+
+  <!-- ========== EMAIL J+7 ========== -->
+  <div class="email-block">
+    <div class="email-header red-header">
+      <h2>✉️ Email J+7 — Dernier contact</h2>
+      <span class="badge">7 jours après J0, si toujours pas de réponse</span>
+    </div>
+    <div class="email-meta">
+      <div class="meta-row"><span class="meta-label">Objet :</span> Dernier message — NightBook</div>
+      <div class="meta-row"><span class="meta-label">À :</span> [MÊME EMAIL QU'EN J0]</div>
+    </div>
+    <div class="email-body">Bonjour,
+
+Je ne veux pas encombrer votre boîte mail — ce sera mon dernier message.
+
+Une question simple : la gestion de vos réservations VIP est-elle quelque chose que vous souhaitez améliorer dans les prochains mois ?
+
+Si oui, je suis disponible quand vous voulez.
+Si non, pas de souci — je ne reviendrai pas vers vous.
+
+Cordialement,
+Maxime ECK
+NightBook
+📞 07 69 20 82 74
+✉️ nightbook.contact@gmail.com</div>
+    <div class="note">
+      <strong>Pourquoi ce format :</strong> le J+7 doit être court et sans pression. L'objectif n'est plus de convaincre, mais d'obtenir un signal — oui ou non. Ce format génère souvent plus de réponses que les relances longues, même tardives.
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
