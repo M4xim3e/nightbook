@@ -1,8 +1,43 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FreshTrack
+
+**Gestion de stock et alertes de péremption pour restaurants indépendants français.**
+
+Scanner vos factures, gérez votre stock automatiquement, recevez des alertes avant qu'un produit expire.
+
+## Stack technique
+
+| Technologie | Usage |
+|-------------|-------|
+| Next.js 16 (App Router) | Framework frontend |
+| TypeScript | Langage |
+| Supabase | Base de données + Auth + Storage |
+| Anthropic Claude | OCR des factures |
+| Stripe | Abonnements (Starter 29€ / Pro 49€ / Multi 99€) |
+| Tailwind CSS | Styles |
+| Resend | Emails d'alerte |
+| Twilio | SMS d'alerte |
+| Vercel | Déploiement + Cron |
+
+## Installation locale
+
+```bash
+npm install
+cp .env.example .env.local
+# Éditer .env.local
+npm run dev
+```
+
+## Étapes post-déploiement
+
+1. Supabase : exécuter migrations SQL, créer bucket `invoices` (privé)
+2. Stripe : créer 3 plans, configurer webhook `/api/stripe/webhook`
+3. Vercel : ajouter variables d'environnement, le cron s'exécute à 8h
+4. Resend : vérifier le domaine freshtrack.fr
+5. Twilio (optionnel) : acheter un numéro pour les SMS
 
 ## Getting Started
 
-First, run the development server:
+Run the development server:
 
 ```bash
 npm run dev

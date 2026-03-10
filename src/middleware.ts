@@ -1,6 +1,9 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+const PROTECTED_ROUTES = ['/dashboard', '/scan', '/stock', '/alerts', '/products', '/settings']
+const AUTH_ROUTES = ['/login', '/register']
+
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
@@ -9,7 +12,9 @@ export async function middleware(request: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        getAll() { return request.cookies.getAll() },
+        getAll() {
+          return request.cookies.getAll()
+        },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
           supabaseResponse = NextResponse.next({ request })
@@ -21,67 +26,36 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  const { data: { user } } = await supabase.auth.getUser()
-  const pathname = request.nextUrl.pathname
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  // Non connecté → login
-  if (!user && (pathname.startsWith('/dashboard') || pathname.startsWith('/admin'))) {
+  const pathname = request.nextUrl.pathname
+  const isProtected = PROTECTED_ROUTES.some((route) => pathname.startsWith(route))
+  const isAuthRoute = AUTH_ROUTES.includes(pathname)
+
+  // Not logged in → redirect to login
+  if (!user && isProtected) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  if (user) {
-    // Vérifier si admin à chaque fois
-    const { data: adminRecord } = await supabase
-      .from('admins').select('id').eq('email', user.email).single()
-
-    const isAdmin = !!adminRecord
-
-    // Admin qui essaie d'aller sur /dashboard → redirigé vers /admin
-    if (isAdmin && pathname.startsWith('/dashboard')) {
-      return NextResponse.redirect(new URL('/admin', request.url))
-    }
-
-    // Admin ou boîte connectée sur /login ou /register → bonne redirection
-    if (pathname === '/login' || pathname === '/register') {
-      return NextResponse.redirect(new URL(isAdmin ? '/admin' : '/dashboard', request.url))
-    }
-
-    // Non-admin qui essaie d'aller sur /admin → redirigé vers /dashboard
-    if (!isAdmin && pathname.startsWith('/admin')) {
-      return NextResponse.redirect(new URL('/dashboard', request.url))
-    }
-
-    // Boîte avec statut paused, suspended ou trial expiré
-    if (!isAdmin && pathname.startsWith('/dashboard')) {
-      const { data: venue } = await supabase
-        .from('venues').select('status, subscription_status, trial_ends_at').eq('user_id', user.id).single()
-
-      // Pas de venue → compte orphelin, déconnexion
-      if (!venue) {
-        await supabase.auth.signOut()
-        return NextResponse.redirect(new URL('/login', request.url))
-      }
-
-      if (venue.status === 'suspended') {
-        return NextResponse.redirect(new URL('/suspended', request.url))
-      }
-      if (venue.status === 'paused') {
-        return NextResponse.redirect(new URL('/paused', request.url))
-      }
-      // Trial expiré → page d'abonnement
-      const isActive = venue.subscription_status === 'active'
-      const isTrialing = venue.subscription_status === 'trialing'
-      const trialEndsAt = venue.trial_ends_at ? new Date(venue.trial_ends_at) : null
-      const trialValid = isTrialing && trialEndsAt !== null && trialEndsAt > new Date()
-      if (!isActive && !trialValid) {
-        return NextResponse.redirect(new URL('/subscribe', request.url))
-      }
-    }
+  // Logged in → redirect away from auth routes
+  if (user && isAuthRoute) {
+    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
   return supabaseResponse
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/admin/:path*', '/login', '/register'],
+  matcher: [
+    '/dashboard/:path*',
+    '/scan/:path*',
+    '/stock/:path*',
+    '/alerts/:path*',
+    '/products/:path*',
+    '/settings/:path*',
+    '/login',
+    '/register',
+  ],
 }

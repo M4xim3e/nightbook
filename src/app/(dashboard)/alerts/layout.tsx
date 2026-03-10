@@ -2,15 +2,14 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { Navbar } from '@/components/layout/navbar'
 
-export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-
   if (!user) redirect('/login')
 
   const { data: restaurant } = await supabase
     .from('restaurants')
-    .select('name, subscription_status')
+    .select('name')
     .eq('owner_id', user.id)
     .single()
 

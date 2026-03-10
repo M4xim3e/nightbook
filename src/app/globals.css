@@ -8,19 +8,52 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.data-\[state\=open\]\:animate-in[data-state="open"],
+[data-state="open"].data-\[state\=open\]\:animate-in {
+  animation: fadeIn 0.15s ease-out;
+}
+
+.data-\[state\=open\]\:fade-in-0[data-state="open"],
+.data-\[state\=open\]\:zoom-in-95[data-state="open"],
+.data-\[state\=open\]\:slide-in-from-top-full[data-state="open"],
+.data-\[state\=open\]\:slide-in-from-bottom-full[data-state="open"],
+.data-\[state\=open\]\:slide-in-from-left-1\/2[data-state="open"],
+.data-\[state\=open\]\:slide-in-from-top-\[48\%\][data-state="open"] {
+  animation: fadeIn 0.15s ease-out;
+}
+
+.data-\[state\=closed\]\:animate-out[data-state="closed"],
+.data-\[state\=closed\]\:fade-out-80[data-state="closed"],
+.data-\[state\=closed\]\:zoom-out-95[data-state="closed"],
+.data-\[state\=closed\]\:slide-out-to-right-full[data-state="closed"],
+.data-\[state\=closed\]\:slide-out-to-left-1\/2[data-state="closed"],
+.data-\[state\=closed\]\:slide-out-to-top-\[48\%\][data-state="closed"] {
+  animation: fadeIn 0.1s ease-in reverse;
 }
